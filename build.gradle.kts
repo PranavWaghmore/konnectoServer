@@ -32,10 +32,7 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 
 
-   // val kotlin_version = "2.1.10"
-    //val kmongo_version = "5.2.0"
-    // koin -- "3.5.0"
-   // val ktor_version = "3.2.0"
+
     // KMongo
     implementation("org.litote.kmongo:kmongo:5.2.0")
     implementation("org.litote.kmongo:kmongo-coroutine:5.2.0")
@@ -56,5 +53,5 @@ dependencies {
     // Kotlin Test
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.1.10")
     // Truth
-    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation("com.google.truth:truth:1.4.4")
 }

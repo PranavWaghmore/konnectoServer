@@ -9,15 +9,17 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@Suppress("unused")
 fun Application.module() {
-    configureSockets()
-    configureSerialization()
-    configureMonitoring()
-    configureHTTP()
-    configureSecurity()
-    configureRouting()
-    install(Koin){
+    install(Koin) {
         modules(mainModule)
     }
+    configureSecurity()
+    configureSockets()
+    configureRouting()
+    configureHTTP()
+    configureMonitoring()
+    configureSerialization()
 }
+
 
