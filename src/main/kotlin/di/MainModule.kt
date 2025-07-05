@@ -1,8 +1,10 @@
 package pw.coding.di
 
+import data.repository.follow.FollowRepository
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import pw.coding.data.repository.follow.FollowRepositoryImpl
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.repository.user.UserRepositoryImpl
 import pw.coding.util.Constants
@@ -17,5 +19,8 @@ val mainModule = module{
     }
     single<UserRepository>{
         UserRepositoryImpl(get())
+    }
+    single<FollowRepository>{
+        FollowRepositoryImpl(get())
     }
 }
