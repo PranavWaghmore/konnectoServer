@@ -1,0 +1,17 @@
+package pw.coding.data.repository.post
+
+import pw.coding.data.models.Post
+import pw.coding.util.Constants
+
+interface PostRepository {
+
+    suspend fun createPostIfUserExists(post: Post):Boolean
+
+    suspend fun deletePostById(postId : String)
+
+    suspend fun getPostsByFollows(
+        ownUserId: String,
+        page: Int = 0,
+        pageSize: Int = Constants.PAGE_SIZE
+    ): List<Post>
+}
