@@ -9,20 +9,20 @@ import pw.coding.data.models.User
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages.FIELDS_BLANK
 import pw.coding.util.ApiResponseMessages.INVALID_CREDENTIALS
 import pw.coding.util.ApiResponseMessages.USER_ALREADY_EXISTS
 
 fun Route.createUserRoute(
-    userRepository: UserRepository
+    userService: UserService
 ) {
     post("/api/user/create") {
         val request = call.receiveNullable<CreateUserRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val userExist = userRepository.getUserByEmail(request.email) != null
-        if (userExist) {
+        if (userService.doesUserWithEmailExist(request.email)) {
             call.respond(
                 BasicApiResponse(
                     successful = false,
@@ -31,33 +31,29 @@ fun Route.createUserRoute(
             )
             return@post
         }
-        if (request.email.isBlank() || request.password.isBlank()
-            || request.username.isBlank()
-        ) {
-            BasicApiResponse(
-                successful = false,
-                message = FIELDS_BLANK
-            )
-            return@post
+        when(userService.validateCreateAccountRequest(request)){
+            is UserService.ValidationEvent.ErrorFieldEmpty ->{
+                call.respond(
+                    BasicApiResponse(
+                        successful = false,
+                        message = FIELDS_BLANK
+                    ),
+                    return@post
+                )
+            }
+
+            is UserService.ValidationEvent.Success ->{
+                userService.createUser(request)
+                call.respond(
+                    BasicApiResponse(successful = true)
+                )
+            }
         }
-        userRepository.createUser(
-            User(
-                email = request.email,
-                username = request.username,
-                password = request.password,
-                profileImageUrl = "",
-                bio = "",
-                gitHubUrl = "",
-                instagramUrl = "",
-                linkedInUrl = "",
-            )
-        )
-        call.respond(BasicApiResponse(successful = true))
     }
 }
 
 fun Route.loginUser(
-    userRepository: UserRepository
+   userService: UserService
 ) {
     post("/api/user/login") {
         val request = call.receiveNullable<LoginRequest>() ?: kotlin.run {
@@ -65,16 +61,13 @@ fun Route.loginUser(
             return@post
         }
 
+
         if(request.email.isBlank() || request.password.isBlank()){
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val isCorrectPassword = userRepository.doesPasswordForUserMatch(
-            email = request.email,
-            enteredPassword = request.password
-        )
-
+        val isCorrectPassword = userService.isLoginPasswordCorrect(request)
         if(isCorrectPassword){
             call.respond(
                 BasicApiResponse(

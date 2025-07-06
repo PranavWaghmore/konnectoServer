@@ -7,6 +7,8 @@ import org.litote.kmongo.reactivestreams.KMongo
 import pw.coding.data.repository.follow.FollowRepositoryImpl
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.repository.user.UserRepositoryImpl
+import pw.coding.service.FollowService
+import pw.coding.service.UserService
 import pw.coding.util.Constants
 
 
@@ -22,5 +24,12 @@ val mainModule = module{
     }
     single<FollowRepository>{
         FollowRepositoryImpl(get())
+    }
+
+    single {
+        UserService(get())
+    }
+    single {
+        FollowService(get())
     }
 }

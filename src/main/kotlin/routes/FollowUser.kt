@@ -7,20 +7,18 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import pw.coding.data.requests.FollowUpdateRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.service.FollowService
 import pw.coding.util.ApiResponseMessages.USER_NOT_FOUND
 
 fun Route.followUser(
-    followRepository: FollowRepository
+    followService: FollowService
 ){
     post("/api/following/follow") {
         val request = call.receiveNullable<FollowUpdateRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val didUserExists = followRepository.followUserIfExists(
-            request.followingUserId,
-            request.followedUserId
-        )
+        val didUserExists = followService.followUserIfExists(request)
         if(didUserExists){
             call.respond(
                 HttpStatusCode.BadRequest,
@@ -42,17 +40,14 @@ fun Route.followUser(
 
 
 fun Route.unfollowUser(
-    followRepository: FollowRepository
+   followService: FollowService
 ){
     delete("/api/following/unfollow"){
         val request = call.receiveNullable<FollowUpdateRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@delete
         }
-        val didUserExists = followRepository.unfollowUserIfExists(
-            request.followingUserId,
-            request.followedUserId
-        )
+        val didUserExists = followService.unfollowUserIfExists(request)
         if(didUserExists){
             call.respond(
                 HttpStatusCode.BadRequest,

@@ -9,23 +9,17 @@ import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.requests.CreatePostRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.service.PostService
 import pw.coding.util.ApiResponseMessages
 
-fun Route.createPostRoute(postRepository: PostRepository) {
+fun Route.createPostRoute(postService: PostService) {
     post("/api/post/create") {
         val request = call.receiveNullable<CreatePostRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val didUserExists = postRepository.createPostIfUserExists(
-            post = Post(
-                imageUrl = "",
-                userId = request.userId,
-                timestamp = System.currentTimeMillis(),
-                description = request.description
-            )
-        )
+        val didUserExists = postService.createPostIfUserExists(request)
         if (!didUserExists) {
             call.respond(
                 HttpStatusCode.BadRequest,
