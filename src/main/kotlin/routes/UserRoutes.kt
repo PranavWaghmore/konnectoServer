@@ -1,5 +1,7 @@
 package pw.coding.routes
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -8,11 +10,13 @@ import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.models.User
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
+import pw.coding.data.responses.AuthResponse
 import pw.coding.data.responses.BasicApiResponse
 import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages.FIELDS_BLANK
 import pw.coding.util.ApiResponseMessages.INVALID_CREDENTIALS
 import pw.coding.util.ApiResponseMessages.USER_ALREADY_EXISTS
+import java.util.*
 
 fun Route.createUserRoute(
     userService: UserService
@@ -41,7 +45,6 @@ fun Route.createUserRoute(
                     return@post
                 )
             }
-
             is UserService.ValidationEvent.Success ->{
                 userService.createUser(request)
                 call.respond(
@@ -53,7 +56,10 @@ fun Route.createUserRoute(
 }
 
 fun Route.loginUser(
-   userService: UserService
+   userService: UserService,
+   jwtIssuer: String,
+   jwtAudience: String,
+   jwtSecret : String
 ) {
     post("/api/user/login") {
         val request = call.receiveNullable<LoginRequest>() ?: kotlin.run {
@@ -61,17 +67,23 @@ fun Route.loginUser(
             return@post
         }
 
-
         if(request.email.isBlank() || request.password.isBlank()){
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val isCorrectPassword = userService.isLoginPasswordCorrect(request)
+        val isCorrectPassword = userService.doesPasswordMatchForUser(request)
         if(isCorrectPassword){
+            val expiresIn = 1000L * 60L * 60L * 24L * 365L
+            val token = JWT.create()
+                .withClaim("email",request.email)
+                .withIssuer(jwtIssuer)
+                .withExpiresAt(Date(System.currentTimeMillis() +expiresIn))
+                .withAudience(jwtAudience)
+                .sign(Algorithm.HMAC256(jwtSecret))
             call.respond(
-                BasicApiResponse(
-                    successful = true
+                AuthResponse(
+                    token = token
                 )
             )
         }else{

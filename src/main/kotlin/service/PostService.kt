@@ -7,8 +7,7 @@ import pw.coding.data.requests.CreatePostRequest
 class PostService(
     private  val repository: PostRepository
 ) {
-
-    suspend fun createPostIfUserExists(request: CreatePostRequest) : Boolean{
+    suspend fun createPostIfUserExists(request: CreatePostRequest): Boolean{
        return repository.createPostIfUserExists(
             post = Post(
                 imageUrl = "",

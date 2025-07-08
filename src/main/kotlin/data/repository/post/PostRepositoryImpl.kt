@@ -1,5 +1,6 @@
 package pw.coding.data.repository.post
 
+import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.`in`
@@ -7,20 +8,19 @@ import pw.coding.data.models.Following
 import pw.coding.data.models.Post
 import pw.coding.data.models.User
 
-class PostRepositoryImp(
+class PostRepositoryImpl(
     db: CoroutineDatabase
-): PostRepository {
-
+) : PostRepository {
     private val posts = db.getCollection<Post>()
     private val following = db.getCollection<Following>()
     private val users = db.getCollection<User>()
 
     override suspend fun createPostIfUserExists(post: Post): Boolean {
-        val doesUserExists = users.findOne(post.userId) != null
-        if(!doesUserExists){
+        val doesUserExists = users.findOneById(post.userId) != null
+        if (!doesUserExists) {
             return false
         }
-         posts.insertOne(post)
+        posts.insertOne(post)
         return true
     }
 
@@ -39,8 +39,8 @@ class PostRepositoryImp(
                 it.followedUserId
             }
 
-        return posts.find(Post:: userId `in` userIdsFromFollows)
-            .skip(page*pageSize)
+        return posts.find(Post::userId `in` userIdsFromFollows)
+            .skip(page * pageSize)
             .limit(pageSize)
             .descendingSort(Post::timestamp)
             .toList()

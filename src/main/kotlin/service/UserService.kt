@@ -4,7 +4,6 @@ import pw.coding.data.models.User
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
-import kotlin.reflect.jvm.internal.ReflectProperties.Val
 
 class UserService(
     private val repository: UserRepository
@@ -12,6 +11,10 @@ class UserService(
 
     suspend fun doesUserWithEmailExist(email : String): Boolean{
         return repository.getUserByEmail(email) != null
+    }
+
+    suspend fun doesEmailBelongsToUserId(email: String , userId : String): Boolean{
+        return  repository.doesUserBelongsToUserId(email, userId)
     }
 
     suspend fun createUser(request: CreateUserRequest){
@@ -38,19 +41,11 @@ class UserService(
     }
 
     sealed class ValidationEvent(){
-        object ErrorFieldEmpty: ValidationEvent()
-        object Success: ValidationEvent()
+         object ErrorFieldEmpty: ValidationEvent()
+         object Success: ValidationEvent()
     }
 
-//    fun validateLoginAccountRequest(request: LoginRequest):ValidationEvent{
-//        return if (request.email.isBlank() || request.password.isBlank()) {
-//            ValidationEvent.ErrorFieldEmpty
-//        }else{
-//            ValidationEvent.Success
-//        }
-//    }
-
-    suspend fun isLoginPasswordCorrect(request: LoginRequest):Boolean{
+    suspend fun doesPasswordMatchForUser(request: LoginRequest):Boolean{
         return repository.doesPasswordForUserMatch(
             email = request.email,
             enteredPassword = request.password

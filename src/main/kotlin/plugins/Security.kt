@@ -23,9 +23,9 @@ import org.slf4j.event.*
 
 fun Application.configureSecurity() {
     // Please read the jwt property from the config file if you are using EngineMain
-    val jwtAudience = "jwt-audience"
-    val jwtDomain = "https://jwt-provider-domain/"
-    val jwtRealm = "ktor sample app"
+    val jwtAudience = "main"
+    val jwtDomain = "https://0.0.0.0:8001"
+    val jwtRealm = "konnecto"
     val jwtSecret = "secret"
     authentication {
         jwt {
@@ -38,7 +38,9 @@ fun Application.configureSecurity() {
                     .build()
             )
             validate { credential ->
-                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+                if (credential.payload.audience.contains(jwtAudience))
+                    JWTPrincipal(credential.payload)
+                else null
             }
         }
     }
