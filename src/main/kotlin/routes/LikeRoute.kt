@@ -53,7 +53,7 @@ fun Route.unlikeParent(
     userService: UserService
 ) {
     authenticate {
-        delete("/api/like") {
+        delete("/api/unlike") {
             val request = call.receiveNullable<LikeUpdateRequest>() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
