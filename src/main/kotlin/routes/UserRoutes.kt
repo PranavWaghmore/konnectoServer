@@ -6,8 +6,6 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import pw.coding.data.repository.user.UserRepository
-import pw.coding.data.models.User
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.responses.AuthResponse
@@ -18,7 +16,7 @@ import pw.coding.util.ApiResponseMessages.INVALID_CREDENTIALS
 import pw.coding.util.ApiResponseMessages.USER_ALREADY_EXISTS
 import java.util.*
 
-fun Route.createUserRoute(
+fun Route.createUser(
     userService: UserService
 ) {
     post("/api/user/create") {

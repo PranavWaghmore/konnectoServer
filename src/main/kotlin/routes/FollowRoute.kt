@@ -1,6 +1,5 @@
 package pw.coding.routes
 
-import data.repository.follow.FollowRepository
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*

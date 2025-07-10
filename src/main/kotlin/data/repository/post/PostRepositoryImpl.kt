@@ -1,6 +1,5 @@
 package pw.coding.data.repository.post
 
-import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.`in`
@@ -44,5 +43,11 @@ class PostRepositoryImpl(
             .limit(pageSize)
             .descendingSort(Post::timestamp)
             .toList()
+
+
+    }
+
+    override suspend fun getPost(postId: String): Post? {
+        return posts.findOneById(postId)
     }
 }
