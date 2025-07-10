@@ -32,6 +32,14 @@ class CommentService(
         return ValidationEvent.Success
     }
 
+    suspend fun getCommentsForPost(postId: String):List<Comment>{
+        return repository.getCommentsForPost(postId)
+    }
+
+    suspend fun deleteComment(commentId: String): Boolean{
+        return repository.deleteComment(commentId)
+    }
+
     sealed class ValidationEvent{
         object Success: ValidationEvent()
         object ErrorFieldEmpty: ValidationEvent()

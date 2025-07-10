@@ -67,7 +67,7 @@ fun Route.getPostForFollows(
     userService: UserService
 ) {
     authenticate {
-        get {
+        get("/api/post/get") {
             val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get

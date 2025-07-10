@@ -4,16 +4,14 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import pw.coding.routes.*
-import pw.coding.service.FollowService
-import pw.coding.service.LikeService
-import pw.coding.service.PostService
-import pw.coding.service.UserService
+import pw.coding.service.*
 
 fun Application.configureRouting() {
     val userService: UserService by inject()
     val followService: FollowService by inject()
     val postService: PostService by inject()
     val likeService: LikeService by inject()
+    val commentService: CommentService by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
@@ -37,8 +35,13 @@ fun Application.configureRouting() {
         getPostForFollows(postService , userService)
         deletePost(postService,userService , likeService)
 
-        //like
+        //Like
         likeParent(likeService, userService)
         unlikeParent(likeService , userService)
+
+        //Comment Route
+        createComment(commentService, userService)
+        getCommentsForPost(commentService)
+        deleteComment(commentService, userService, likeService)
     }
 }

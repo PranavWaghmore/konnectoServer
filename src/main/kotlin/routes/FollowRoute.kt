@@ -20,7 +20,7 @@ fun Route.followUser(
         val didUserExists = followService.followUserIfExists(request)
         if(didUserExists){
             call.respond(
-                HttpStatusCode.BadRequest,
+                HttpStatusCode.OK,
                 BasicApiResponse(
                     successful = true
                 )

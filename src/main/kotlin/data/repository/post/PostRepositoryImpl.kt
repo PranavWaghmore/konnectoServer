@@ -30,14 +30,13 @@ class PostRepositoryImpl(
     override suspend fun getPostsByFollows(
         ownUserId: String,
         page: Int,
-        pageSize: Int
+        pageSize: Int,
     ): List<Post> {
-        val userIdsFromFollows = following.find(Following::followedUserId eq ownUserId)
+        val userIdsFromFollows = following.find(Following::followingUserId eq ownUserId)
             .toList()
             .map {
                 it.followedUserId
             }
-
         return posts.find(Post::userId `in` userIdsFromFollows)
             .skip(page * pageSize)
             .limit(pageSize)

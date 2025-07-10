@@ -6,15 +6,14 @@ import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import pw.coding.data.repository.follow.FollowRepositoryImpl
 import data.repository.likes.LikeRepository
+import pw.coding.data.repository.comment.CommentRepository
+import pw.coding.data.repository.comment.CommentRepositoryImpl
 import pw.coding.data.repository.like.LikeRepositoryImpl
 import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.repository.post.PostRepositoryImpl
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.repository.user.UserRepositoryImpl
-import pw.coding.service.FollowService
-import pw.coding.service.LikeService
-import pw.coding.service.PostService
-import pw.coding.service.UserService
+import pw.coding.service.*
 import pw.coding.util.Constants
 
 
@@ -29,9 +28,11 @@ val mainModule = module{
     single<FollowRepository>{ FollowRepositoryImpl(get()) }
     single<PostRepository> { PostRepositoryImpl(get()) }
     single<LikeRepository> { LikeRepositoryImpl(get()) }
+    single<CommentRepository> { CommentRepositoryImpl(get()) }
 
     single { UserService(get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
     single { LikeService(get()) }
+    single { CommentService(get()) }
 }
