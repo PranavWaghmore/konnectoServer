@@ -12,8 +12,7 @@ import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages
 
 fun Route.likeParent(
-    likeService: LikeService,
-    userService: UserService
+    likeService: LikeService
 ) {
     authenticate {
         post("/api/like") {
@@ -21,36 +20,28 @@ fun Route.likeParent(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-
-            ifEmailBelongsToUSer(
-                call = call,
-                userId = request.userId,
-                validateEmail = userService::doesEmailBelongsToUserId
-            ) {
-                val likeSuccessful = likeService.likeParent(request.userId, request.parentId)
-                if (likeSuccessful) {
-                    call.respond(
-                        HttpStatusCode.OK,
-                        BasicApiResponse(
-                            successful = true
-                        )
+            val likeSuccessful = likeService.likeParent(call.userID, request.parentId)
+            if (likeSuccessful) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = true
                     )
-                }else{
-                    call.respond(HttpStatusCode.OK ,
-                        BasicApiResponse(
-                            successful = false,
-                            message = ApiResponseMessages.USER_NOT_FOUND
-                        )
+                )
+            }else{
+                call.respond(HttpStatusCode.OK ,
+                    BasicApiResponse(
+                        successful = false,
+                        message = ApiResponseMessages.USER_NOT_FOUND
                     )
-                }
+                )
             }
         }
     }
 }
 
 fun Route.unlikeParent(
-    likeService: LikeService,
-    userService: UserService
+    likeService: LikeService
 ) {
     authenticate {
         delete("/api/unlike") {
@@ -58,28 +49,21 @@ fun Route.unlikeParent(
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
             }
-
-            ifEmailBelongsToUSer(
-                call = call,
-                userId = request.userId,
-                validateEmail = userService::doesEmailBelongsToUserId
-            ) {
-                val unlikeSuccessful = likeService.unlinkParent(request.userId, request.parentId)
-                if (unlikeSuccessful) {
-                    call.respond(
-                        HttpStatusCode.OK,
-                        BasicApiResponse(
-                            successful = true
-                        )
+            val unlikeSuccessful = likeService.unlinkParent(call.userID, request.parentId)
+            if (unlikeSuccessful) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = true
                     )
-                }else{
-                    call.respond(HttpStatusCode.OK ,
-                        BasicApiResponse(
-                            successful = false,
-                            message = ApiResponseMessages.USER_NOT_FOUND
-                        )
+                )
+            }else{
+                call.respond(HttpStatusCode.OK ,
+                    BasicApiResponse(
+                        successful = false,
+                        message = ApiResponseMessages.USER_NOT_FOUND
                     )
-                }
+                )
             }
         }
     }

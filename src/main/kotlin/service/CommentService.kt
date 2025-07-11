@@ -10,10 +10,10 @@ class CommentService(
     val repository: CommentRepository
 ) {
 
-    suspend fun createComment(createCommentRequest: CreateCommentRequest): ValidationEvent{
+    suspend fun createComment(createCommentRequest: CreateCommentRequest , userId: String): ValidationEvent{
 
         createCommentRequest.apply {
-            if(comment.isBlank() || userId.isBlank() || postId.isBlank()){
+            if(comment.isBlank() ||  postId.isBlank()){
                 return ValidationEvent.ErrorFieldEmpty
             }
 
@@ -25,7 +25,7 @@ class CommentService(
             Comment(
                 comment = createCommentRequest.comment,
                 postId = createCommentRequest.postId,
-                userId = createCommentRequest.userId,
+                userId = userId,
                 timestamp = System.currentTimeMillis()
             )
         )
@@ -40,6 +40,9 @@ class CommentService(
         return repository.deleteComment(commentId)
     }
 
+    suspend fun getCommentById(commentId: String):Comment?{
+        return repository.getComment(commentId)
+    }
     sealed class ValidationEvent{
         object Success: ValidationEvent()
         object ErrorFieldEmpty: ValidationEvent()

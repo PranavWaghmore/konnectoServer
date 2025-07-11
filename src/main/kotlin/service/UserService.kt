@@ -17,6 +17,13 @@ class UserService(
         return  repository.doesUserBelongsToUserId(email, userId)
     }
 
+    suspend fun getUserByEmail(email: String):User?{
+        return repository.getUserByEmail(email)
+    }
+
+    suspend fun validatePassword(enteredPassword: String , actualPassword : String):Boolean{
+        return enteredPassword == actualPassword
+    }
     suspend fun createUser(request: CreateUserRequest){
         repository.createUser(
             User(

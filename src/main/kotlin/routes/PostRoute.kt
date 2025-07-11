@@ -16,8 +16,7 @@ import pw.coding.util.Constants
 import pw.coding.util.QueryParams
 
 fun Route.createPost(
-    postService: PostService,
-    userService: UserService,
+    postService: PostService
 ) {
     authenticate {
         post("/api/post/create") {
@@ -26,38 +25,24 @@ fun Route.createPost(
                 return@post
             }
 
-//            val email = call.principal<JWTPrincipal>()?.getClaim(name = "email", String::class)
-//            val isEmailByUser = userService.doesEmailBelongsToUserId(
-//                email = email ?: "",
-//                userId = request.userId
-//            )
-//            if (!isEmailByUser) {
-//                call.respond(HttpStatusCode.Unauthorized, "You are not who say You are.")
-//                return@post
-//            }
-           ifEmailBelongsToUSer(
-               call = call,
-               userId = request.userId,
-               validateEmail = userService::doesEmailBelongsToUserId
-           ){
-               val didUserExists = postService.createPostIfUserExists(request)
-               if (!didUserExists) {
-                   call.respond(
-                       HttpStatusCode.OK,
-                       BasicApiResponse(
-                           successful = false,
-                           message = ApiResponseMessages.USER_NOT_FOUND
-                       )
-                   )
-               } else {
-                   call.respond(
-                       HttpStatusCode.OK,
-                       BasicApiResponse(
-                           successful = true
-                       )
-                   )
-               }
-           }
+            val userId = call.userID
+            val didUserExists = postService.createPostIfUserExists(request , userId)
+            if (!didUserExists) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = false,
+                        message = ApiResponseMessages.USER_NOT_FOUND
+                    )
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = true
+                    )
+                )
+            }
         }
     }
 }
@@ -68,32 +53,21 @@ fun Route.getPostForFollows(
 ) {
     authenticate {
         get("/api/post/get") {
-            val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
             val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
                 ?.toIntOrNull() ?: Constants.PAGE_SIZE
 
-            ifEmailBelongsToUSer(
-                call = call,
-                userId = userId,
-                validateEmail = userService::doesEmailBelongsToUserId
-            ){
-                val posts = postService.getPostsByFollows(userId , page , pageSize)
-                call.respond(
-                    HttpStatusCode.OK ,
-                    posts
-                )
-            }
+            val posts = postService.getPostsByFollows(ownUserId = call.userID , page , pageSize)
+            call.respond(
+                HttpStatusCode.OK ,
+                posts
+            )
         }
     }
 }
 
 fun Route.deletePost(
     postService: PostService,
-    userService: UserService,
     likeService: LikeService
 ){
     authenticate {
@@ -110,24 +84,13 @@ fun Route.deletePost(
                 )
                 return@delete
             }
-//            val email = call.principal<JWTPrincipal>()?.getClaim(name = "email", String::class)
-//            val isEmailByUser = userService.doesEmailBelongsToUserId(
-//                email = email ?: "",
-//                userId = post.userId
-//            )
-//            if (!isEmailByUser) {
-//                call.respond(HttpStatusCode.Unauthorized, "You are not who say You are.")
-//                return@delete
-//            }
-             ifEmailBelongsToUSer(
-                 call = call,
-                 userId = post.userId,
-                 validateEmail = userService::doesEmailBelongsToUserId
-             ){
-                 postService.deletePost(request.postId)
-                 likeService.deleteLikesForParent(request.postId)
-                 call.respond(HttpStatusCode.OK)
-             }
+            if(post.userId == call.userID){
+                postService.deletePost(request.postId)
+                likeService.deleteLikesForParent(request.postId)
+                call.respond(HttpStatusCode.OK)
+            }else{
+                call.respond(HttpStatusCode.Unauthorized)
+            }
         }
     }
 }

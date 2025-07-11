@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.litote.kmongo.util.idValue
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.responses.AuthResponse
@@ -69,12 +70,23 @@ fun Route.loginUser(
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-
-        val isCorrectPassword = userService.doesPasswordMatchForUser(request)
+        val user = userService.getUserByEmail(request.email) ?: kotlin.run {
+            call.respond(
+                BasicApiResponse(
+                    successful = false,
+                    message = INVALID_CREDENTIALS
+                )
+            )
+            return@post
+        }
+        val isCorrectPassword = userService.validatePassword(
+            enteredPassword = request.password,
+            actualPassword = user.password
+        )
         if(isCorrectPassword){
             val expiresIn = 1000L * 60L * 60L * 24L * 365L
             val token = JWT.create()
-                .withClaim("email",request.email)
+                .withClaim("userId",user.id)
                 .withIssuer(jwtIssuer)
                 .withExpiresAt(Date(System.currentTimeMillis() +expiresIn))
                 .withAudience(jwtAudience)
