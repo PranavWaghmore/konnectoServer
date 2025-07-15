@@ -3,10 +3,12 @@ package pw.coding.routes
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.litote.kmongo.util.idValue
+import pw.coding.data.models.User
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.responses.AuthResponse
@@ -15,6 +17,7 @@ import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages.FIELDS_BLANK
 import pw.coding.util.ApiResponseMessages.INVALID_CREDENTIALS
 import pw.coding.util.ApiResponseMessages.USER_ALREADY_EXISTS
+import pw.coding.util.QueryParams
 import java.util.*
 
 fun Route.createUser(
@@ -102,6 +105,28 @@ fun Route.loginUser(
                     successful = false,
                     message = INVALID_CREDENTIALS
                 )
+            )
+        }
+    }
+}
+
+
+fun Route.searchUser(userService: UserService){
+    authenticate {
+        get("/api/user/search") {
+            val query = call.parameters[QueryParams.PARAM_QUERY]
+            if(query.isNullOrBlank()){
+                call.respond(
+                    HttpStatusCode.OK,
+                    listOf<User>()
+                )
+                return@get
+            }
+
+            val searchUsers = userService.searchForUsers(query, call.userID)
+            call.respond(
+                HttpStatusCode.OK,
+                searchUsers
             )
         }
     }

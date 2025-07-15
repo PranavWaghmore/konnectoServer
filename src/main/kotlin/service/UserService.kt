@@ -1,31 +1,44 @@
 package pw.coding.service
 
+import data.repository.follow.FollowRepository
 import pw.coding.data.models.User
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
+import pw.coding.data.responses.UserResponseItem
 
 class UserService(
-    private val repository: UserRepository
+    private val userRepository: UserRepository,
+    private val followRepository: FollowRepository
 ) {
 
     suspend fun doesUserWithEmailExist(email : String): Boolean{
-        return repository.getUserByEmail(email) != null
+        return userRepository.getUserByEmail(email) != null
     }
 
-    suspend fun doesEmailBelongsToUserId(email: String , userId : String): Boolean{
-        return  repository.doesUserBelongsToUserId(email, userId)
+    suspend fun searchForUsers(query: String , userId: String):List<UserResponseItem>{
+        val users = userRepository.searchForUsers(query)
+        val followsByUser = followRepository.getFollowsByUser(userId)
+        return users.map { user ->
+            val isFollowing = followsByUser.find { it.followedUserId == user.id } != null
+            UserResponseItem(
+                username = user.username,
+                profilePictureUrl = user.profileImageUrl,
+                bio = user.bio,
+                isFollowing = isFollowing
+            )
+        }
     }
 
     suspend fun getUserByEmail(email: String):User?{
-        return repository.getUserByEmail(email)
+        return userRepository.getUserByEmail(email)
     }
 
-    suspend fun validatePassword(enteredPassword: String , actualPassword : String):Boolean{
+    fun validatePassword(enteredPassword: String , actualPassword : String):Boolean{
         return enteredPassword == actualPassword
     }
     suspend fun createUser(request: CreateUserRequest){
-        repository.createUser(
+        userRepository.createUser(
             User(
                 email = request.email,
                 username = request.username,
@@ -53,7 +66,7 @@ class UserService(
     }
 
     suspend fun doesPasswordMatchForUser(request: LoginRequest):Boolean{
-        return repository.doesPasswordForUserMatch(
+        return userRepository.doesPasswordForUserMatch(
             email = request.email,
             enteredPassword = request.password
         )

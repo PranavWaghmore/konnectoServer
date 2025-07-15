@@ -33,7 +33,7 @@ val mainModule = module{
     single<CommentRepository> { CommentRepositoryImpl(get()) }
     single<ActivityRepository> { ActivityRepositoryImpl(get()) }
 
-    single { UserService(get()) }
+    single { UserService(get() , get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
     single { LikeService(get()) }
