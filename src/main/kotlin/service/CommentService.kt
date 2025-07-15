@@ -43,9 +43,13 @@ class CommentService(
     suspend fun getCommentById(commentId: String):Comment?{
         return repository.getComment(commentId)
     }
+
+    suspend fun deleteCommentsForPost(postId: String){
+        repository.deleteCommentsFromPost(postId)
+    }
     sealed class ValidationEvent{
-        object Success: ValidationEvent()
         object ErrorFieldEmpty: ValidationEvent()
         object ErrorCommentTooLong: ValidationEvent()
+        object Success : ValidationEvent()
     }
 }

@@ -5,13 +5,17 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import pw.coding.data.models.Activity
 import pw.coding.data.requests.FollowUpdateRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.data.util.ActivityType
+import pw.coding.service.ActivityService
 import pw.coding.service.FollowService
 import pw.coding.util.ApiResponseMessages.USER_NOT_FOUND
 
 fun Route.followUser(
-    followService: FollowService
+    followService: FollowService,
+    activityService: ActivityService
 ){
     authenticate {
         post("/api/following/follow") {
@@ -21,6 +25,15 @@ fun Route.followUser(
             }
             val didUserExists = followService.followUserIfExists(request , call.userID)
             if(didUserExists){
+                activityService.createActivity(
+                    Activity(
+                        timestamp = System.currentTimeMillis(),
+                        byUserId = call.userID,
+                        toUserId = request.followedUserId,
+                        type = ActivityType.FollowedUser.type,
+                        parentId = ""
+                    )
+                )
                 call.respond(
                     HttpStatusCode.OK,
                     BasicApiResponse(

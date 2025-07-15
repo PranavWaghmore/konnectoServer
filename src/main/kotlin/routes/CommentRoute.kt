@@ -8,14 +8,15 @@ import io.ktor.server.routing.*
 import pw.coding.data.requests.CreateCommentRequest
 import pw.coding.data.requests.DeleteCommentRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.service.ActivityService
 import pw.coding.service.CommentService
 import pw.coding.service.LikeService
-import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages
 import pw.coding.util.QueryParams
 
 fun Route.createComment(
-    commentService: CommentService
+    commentService: CommentService,
+    activityService: ActivityService
 ) {
     authenticate {
         post("/api/comment/create") {
@@ -23,7 +24,8 @@ fun Route.createComment(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            when (commentService.createComment(request, call.userID)) {
+            val userId = call.userID
+            when ( commentService.createComment(request, userId)) {
                 CommentService.ValidationEvent.ErrorFieldEmpty ->
                     call.respond(
                         HttpStatusCode.OK,
@@ -42,13 +44,18 @@ fun Route.createComment(
                         )
                     )
 
-                CommentService.ValidationEvent.Success ->
+                is CommentService.ValidationEvent.Success ->{
+                    activityService.addCommentActivity(
+                        byUserId =userId,
+                        postId = request.postId,
+                    )
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse(
                             successful = true
                         )
                     )
+                }
             }
         }
     }
@@ -65,7 +72,7 @@ fun Route.getCommentsForPost(
                 return@get
             }
             val comments = commentService.getCommentsForPost(postId)
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK , comments)
         }
     }
 }

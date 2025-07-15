@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import pw.coding.data.requests.CreatePostRequest
 import pw.coding.data.requests.DeletePostRequest
 import pw.coding.data.responses.BasicApiResponse
+import pw.coding.service.CommentService
 import pw.coding.service.LikeService
 import pw.coding.service.PostService
 import pw.coding.service.UserService
@@ -48,14 +49,13 @@ fun Route.createPost(
 }
 
 fun Route.getPostForFollows(
-    postService: PostService,
-    userService: UserService
+    postService: PostService
 ) {
     authenticate {
         get("/api/post/get") {
             val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
-                ?.toIntOrNull() ?: Constants.PAGE_SIZE
+                ?.toIntOrNull() ?: Constants.POST_PAGE_SIZE
 
             val posts = postService.getPostsByFollows(ownUserId = call.userID , page , pageSize)
             call.respond(
@@ -68,7 +68,8 @@ fun Route.getPostForFollows(
 
 fun Route.deletePost(
     postService: PostService,
-    likeService: LikeService
+    likeService: LikeService,
+    commentService: CommentService
 ){
     authenticate {
         delete ("/api/post/delete") {
@@ -87,6 +88,7 @@ fun Route.deletePost(
             if(post.userId == call.userID){
                 postService.deletePost(request.postId)
                 likeService.deleteLikesForParent(request.postId)
+                commentService.deleteCommentsForPost(request.postId)
                 call.respond(HttpStatusCode.OK)
             }else{
                 call.respond(HttpStatusCode.Unauthorized)
