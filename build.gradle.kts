@@ -31,8 +31,6 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 
-
-
     // KMongo
     implementation("org.litote.kmongo:kmongo:5.2.0")
     implementation("org.litote.kmongo:kmongo-coroutine:5.2.0")

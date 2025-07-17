@@ -5,6 +5,8 @@ import pw.coding.data.models.User
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.requests.CreateUserRequest
 import pw.coding.data.requests.LoginRequest
+import pw.coding.data.requests.UpdateProfileRequest
+import pw.coding.data.responses.ProfileResponse
 import pw.coding.data.responses.UserResponseItem
 
 class UserService(
@@ -16,6 +18,35 @@ class UserService(
         return userRepository.getUserByEmail(email) != null
     }
 
+    suspend fun getUserProfile(userId: String, callerUserId: String):ProfileResponse?{
+        val user = userRepository.getUserById(userId) ?: return  null
+        return ProfileResponse(
+            username = user.username,
+            bio = user.bio,
+            followerCount = user.followerCount,
+            followingCount = user.followingCount,
+            postCount = user.postCount,
+            profilePictureUrl = user.profileImageUrl,
+            topSkillUrls = user.skills,
+            gitHubUrl = user.gitHubUrl,
+            instagramUrl = user.instagramUrl,
+            linkedInUrl = user.linkedInUrl,
+            isOwnProfile = (userId == callerUserId),
+            isFollowing = if(userId != callerUserId){
+                followRepository.doesUserFollow(callerUserId, userId)
+            }else{
+                 false
+            }
+        )
+    }
+
+    suspend fun  updateUser(
+        userId: String,
+        profileImageUrl: String,
+        updateProfileRequest: UpdateProfileRequest
+    ):Boolean{
+        return userRepository.updateUser(userId, profileImageUrl, updateProfileRequest)
+    }
     suspend fun searchForUsers(query: String , userId: String):List<UserResponseItem>{
         val users = userRepository.searchForUsers(query)
         val followsByUser = followRepository.getFollowsByUser(userId)

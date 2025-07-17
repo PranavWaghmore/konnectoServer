@@ -11,7 +11,6 @@ import pw.coding.data.responses.BasicApiResponse
 import pw.coding.service.CommentService
 import pw.coding.service.LikeService
 import pw.coding.service.PostService
-import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages
 import pw.coding.util.Constants
 import pw.coding.util.QueryParams
@@ -26,7 +25,7 @@ fun Route.createPost(
                 return@post
             }
 
-            val userId = call.userID
+            val userId = call.userId
             val didUserExists = postService.createPostIfUserExists(request , userId)
             if (!didUserExists) {
                 call.respond(
@@ -48,7 +47,7 @@ fun Route.createPost(
     }
 }
 
-fun Route.getPostForFollows(
+fun Route.getPostsForFollows(
     postService: PostService
 ) {
     authenticate {
@@ -57,7 +56,7 @@ fun Route.getPostForFollows(
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
                 ?.toIntOrNull() ?: Constants.POST_PAGE_SIZE
 
-            val posts = postService.getPostsByFollows(ownUserId = call.userID , page , pageSize)
+            val posts = postService.getPostsByFollows(userId = call.userId , page , pageSize)
             call.respond(
                 HttpStatusCode.OK ,
                 posts
@@ -85,7 +84,7 @@ fun Route.deletePost(
                 )
                 return@delete
             }
-            if(post.userId == call.userID){
+            if(post.userId == call.userId){
                 postService.deletePost(request.postId)
                 likeService.deleteLikesForParent(request.postId)
                 commentService.deleteCommentsForPost(request.postId)

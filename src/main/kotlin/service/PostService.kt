@@ -20,11 +20,19 @@ class PostService(
     }
 
     suspend fun getPostsByFollows(
-        ownUserId: String,
+        userId: String,
         page: Int = 0,
         pageSize: Int = Constants.POST_PAGE_SIZE
     ): List<Post> {
-        return repository.getPostsByFollows(ownUserId , page , pageSize)
+        return repository.getPostsByFollows(userId , page , pageSize)
+    }
+
+    suspend fun getPostsForProfile(
+        userId: String,
+        page: Int = 0,
+        pageSize: Int = Constants.POST_PAGE_SIZE
+    ): List<Post> {
+        return repository.getPostsByFollows(userId , page , pageSize)
     }
 
     suspend fun getPost(postId : String) : Post?{

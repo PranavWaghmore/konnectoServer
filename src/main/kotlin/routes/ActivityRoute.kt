@@ -17,7 +17,7 @@ fun Route.getActivitiesForUser(
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
                 ?.toIntOrNull() ?: Constants.ACTIVITY_PAGE_SIZE
 
-            val activities = activityService.getActivitiesForUser(userId = call.userID , page , pageSize)
+            val activities = activityService.getActivitiesForUser(userId = call.userId , page , pageSize)
             call.respond(
                 HttpStatusCode.OK,
                 activities

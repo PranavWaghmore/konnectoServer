@@ -1,6 +1,8 @@
 package pw.coding.plugins
 
+import com.google.gson.Gson
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import pw.coding.routes.*
@@ -13,6 +15,7 @@ fun Application.configureRouting() {
     val likeService: LikeService by inject()
     val commentService: CommentService by inject()
     val activityService: ActivityService by inject()
+    val gson:Gson by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
@@ -27,6 +30,9 @@ fun Application.configureRouting() {
             jwtSecret = jwtSecret
         )
         searchUser(userService)
+        getUserProfile(userService)
+        getPostsForProfile(postService)
+        updateUserProfile(userService, gson)
 
         // Following routes
         followUser(followService , activityService)
@@ -34,7 +40,7 @@ fun Application.configureRouting() {
 
         // Post
         createPost(postService)
-        getPostForFollows(postService)
+        getPostsForFollows(postService)
         deletePost(postService, likeService , commentService)
 
         //Like
@@ -48,5 +54,10 @@ fun Application.configureRouting() {
 
         //Activity
         getActivitiesForUser(activityService)
+
+        //staticResources("/static", "static")
+        static {
+            resources("static")
+        }
     }
 }

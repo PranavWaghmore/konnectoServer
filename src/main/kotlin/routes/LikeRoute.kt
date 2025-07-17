@@ -22,7 +22,7 @@ fun Route.likeParent(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val userId = call.userID
+            val userId = call.userId
             val likeSuccessful = likeService.likeParent(userId, request.parentId,request.parentType)
             if (likeSuccessful) {
                 activityService.addLikeActivity(
@@ -58,7 +58,7 @@ fun Route.unlikeParent(
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
             }
-            val unlikeSuccessful = likeService.unlinkParent(call.userID, request.parentId)
+            val unlikeSuccessful = likeService.unlinkParent(call.userId, request.parentId)
             if (unlikeSuccessful) {
                 call.respond(
                     HttpStatusCode.OK,

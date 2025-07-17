@@ -9,10 +9,13 @@ data class User(
     val password: String,
     val profileImageUrl: String,
     val bio: String,
+    val gitHubUrl: String?,
+    val instagramUrl: String?,
+    val linkedInUrl: String?,
+    val followerCount: Int = 0,
+    val followingCount: Int = 0,
+    val postCount: Int = 0,
     val skills: List<String> = listOf(),
-    val gitHubUrl: String,
-    val instagramUrl: String,
-    val linkedInUrl: String,
     @BsonId
     val id: String = ObjectId().toString()
 )

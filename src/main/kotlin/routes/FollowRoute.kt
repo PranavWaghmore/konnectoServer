@@ -23,12 +23,12 @@ fun Route.followUser(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val didUserExists = followService.followUserIfExists(request , call.userID)
+            val didUserExists = followService.followUserIfExists(request , call.userId)
             if(didUserExists){
                 activityService.createActivity(
                     Activity(
                         timestamp = System.currentTimeMillis(),
-                        byUserId = call.userID,
+                        byUserId = call.userId,
                         toUserId = request.followedUserId,
                         type = ActivityType.FollowedUser.type,
                         parentId = ""
@@ -63,7 +63,7 @@ fun Route.unfollowUser(
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
             }
-            val didUserExists = followService.unfollowUserIfExists(request, call.userID)
+            val didUserExists = followService.unfollowUserIfExists(request, call.userId)
             if(didUserExists){
                 call.respond(
                     HttpStatusCode.BadRequest,

@@ -1,5 +1,6 @@
 package pw.coding.di
 
+import com.google.gson.Gson
 import data.repository.follow.FollowRepository
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
@@ -39,5 +40,7 @@ val mainModule = module{
     single { LikeService(get()) }
     single { CommentService(get()) }
     single { ActivityService(get() , get() , get()) }
+
+    single { Gson() }
 
 }

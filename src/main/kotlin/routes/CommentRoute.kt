@@ -24,7 +24,7 @@ fun Route.createComment(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val userId = call.userID
+            val userId = call.userId
             when ( commentService.createComment(request, userId)) {
                 CommentService.ValidationEvent.ErrorFieldEmpty ->
                     call.respond(
@@ -90,7 +90,7 @@ fun Route.deleteComment(
             }
 
             val comment = commentService.getCommentById(request.commentId)
-            if(comment?.userId != call.userID){
+            if(comment?.userId != call.userId){
                 call.respond(HttpStatusCode.Unauthorized)
                 return@delete
             }
