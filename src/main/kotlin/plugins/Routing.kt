@@ -15,7 +15,7 @@ fun Application.configureRouting() {
     val likeService: LikeService by inject()
     val commentService: CommentService by inject()
     val activityService: ActivityService by inject()
-    val gson:Gson by inject()
+    val gson: Gson by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
@@ -32,7 +32,7 @@ fun Application.configureRouting() {
         searchUser(userService)
         getUserProfile(userService)
         getPostsForProfile(postService)
-        updateUserProfile(userService, gson)
+        updateUserProfile(userService , gson)
 
         // Following routes
         followUser(followService , activityService)

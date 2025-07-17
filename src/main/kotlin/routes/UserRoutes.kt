@@ -193,55 +193,48 @@ fun Route.updateUserProfile(
     userService: UserService,
     gson: Gson
 ) {
+
     authenticate {
         put("/api/user/update") {
-            try {
-                // all your logic here
-                val multipart = call.receiveMultipart()
-                var updateProfileRequest: UpdateProfileRequest? = null
-                var fileName: String? = null
-                multipart.forEachPart { partData ->
-                    when (partData) {
-                        is PartData.FormItem -> {
-                            if (partData.name == "update_profile_data") {
-                                updateProfileRequest = gson.fromJson(
-                                    partData.value,
-                                    UpdateProfileRequest::class.java
-                                )
-                            }
+            val multipart = call.receiveMultipart()
+            var updateProfileRequest: UpdateProfileRequest? = null
+            var profilePictureFileName: String? = null
+            multipart.forEachPart { partData ->
+                when (partData) {
+                    is PartData.FormItem -> {
+                        if (partData.name == "update_profile_data") {
+                            updateProfileRequest = gson.fromJson(
+                                partData.value,
+                                UpdateProfileRequest::class.java
+                            )
                         }
-
-                        is PartData.FileItem -> {
-                            val fileBytes = partData.streamProvider().use { it.readAllBytes() }
-                            val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
-                            fileName = UUID.randomUUID().toString()+ "." + fileExtension
-                            File("$PROFILE_PICTURE_PATH$fileName").writeBytes(fileBytes)
-                        }
-
-                        is PartData.BinaryItem -> Unit
-                        is PartData.BinaryChannelItem -> Unit
                     }
-                }
-                val profilePictureUrl = "${BASE_URL}profile_pictures/$fileName"
-                updateProfileRequest?.let { request ->
-                    val updateAcknowledged = userService.updateUser(
-                        userId = call.userId,
-                        profileImageUrl = profilePictureUrl,
-                        updateProfileRequest = request
-                    )
-                    if (updateAcknowledged) {
-                        call.respond(HttpStatusCode.OK, BasicApiResponse(successful = true))
-                    } else {
-                        File("${PROFILE_PICTURE_PATH}/$fileName").delete()
-                        call.respond(HttpStatusCode.InternalServerError)
+                    is PartData.FileItem -> {
+                        val fileBytes = partData.streamProvider().use { it.readAllBytes() }
+                        val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
+                        profilePictureFileName= UUID.randomUUID().toString()+ "." + fileExtension
+                        File("$PROFILE_PICTURE_PATH$profilePictureFileName").writeBytes(fileBytes)
                     }
-                } ?: kotlin.run {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@put
+                    is PartData.BinaryItem -> Unit
+                    is PartData.BinaryChannelItem -> Unit
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                call.respond(HttpStatusCode.InternalServerError, "Exception: ${e.localizedMessage}")
+            }
+            val profilePictureUrl = "${BASE_URL}profile_pictures/$profilePictureFileName"
+            updateProfileRequest?.let { request ->
+                val updateAcknowledged = userService.updateUser(
+                    userId = call.userId,
+                    profileImageUrl = profilePictureUrl,
+                    updateProfileRequest = request
+                )
+                if (updateAcknowledged) {
+                    call.respond(HttpStatusCode.OK, BasicApiResponse(successful = true))
+                } else {
+                    File("${PROFILE_PICTURE_PATH}/$profilePictureFileName").delete()
+                    call.respond(HttpStatusCode.InternalServerError)
+                }
+            } ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@put
             }
         }
     }
