@@ -1,11 +1,9 @@
-package pw.coding.data.repository.like
+package data.repository.likes
 
-import data.repository.likes.LikeRepository
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import pw.coding.data.models.Like
-import pw.coding.data.models.Post
 import pw.coding.data.models.User
 
 class LikeRepositoryImpl(

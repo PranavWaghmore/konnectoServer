@@ -11,7 +11,7 @@ import pw.coding.data.repository.activity.ActivityRepository
 import pw.coding.data.repository.activity.ActivityRepositoryImpl
 import pw.coding.data.repository.comment.CommentRepository
 import pw.coding.data.repository.comment.CommentRepositoryImpl
-import pw.coding.data.repository.like.LikeRepositoryImpl
+import data.repository.likes.LikeRepositoryImpl
 import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.repository.post.PostRepositoryImpl
 import pw.coding.data.repository.user.UserRepository
