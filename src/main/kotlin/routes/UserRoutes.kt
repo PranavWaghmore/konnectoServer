@@ -25,6 +25,7 @@ import pw.coding.util.Constants
 import pw.coding.util.Constants.BASE_URL
 import pw.coding.util.Constants.PROFILE_PICTURE_PATH
 import pw.coding.util.QueryParams
+import pw.coding.util.save
 import java.io.File
 import java.util.*
 
@@ -198,7 +199,7 @@ fun Route.updateUserProfile(
         put("/api/user/update") {
             val multipart = call.receiveMultipart()
             var updateProfileRequest: UpdateProfileRequest? = null
-            var profilePictureFileName: String? = null
+            var fileName: String? = null
             multipart.forEachPart { partData ->
                 when (partData) {
                     is PartData.FormItem -> {
@@ -210,16 +211,13 @@ fun Route.updateUserProfile(
                         }
                     }
                     is PartData.FileItem -> {
-                        val fileBytes = partData.streamProvider().use { it.readAllBytes() }
-                        val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
-                        profilePictureFileName= UUID.randomUUID().toString()+ "." + fileExtension
-                        File("$PROFILE_PICTURE_PATH$profilePictureFileName").writeBytes(fileBytes)
+                        fileName =  partData.save(PROFILE_PICTURE_PATH)
                     }
                     is PartData.BinaryItem -> Unit
                     is PartData.BinaryChannelItem -> Unit
                 }
             }
-            val profilePictureUrl = "${BASE_URL}profile_pictures/$profilePictureFileName"
+            val profilePictureUrl = "${BASE_URL}profile_pictures/$fileName"
             updateProfileRequest?.let { request ->
                 val updateAcknowledged = userService.updateUser(
                     userId = call.userId,
@@ -229,7 +227,7 @@ fun Route.updateUserProfile(
                 if (updateAcknowledged) {
                     call.respond(HttpStatusCode.OK, BasicApiResponse(successful = true))
                 } else {
-                    File("${PROFILE_PICTURE_PATH}/$profilePictureFileName").delete()
+                    File("${PROFILE_PICTURE_PATH}/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
             } ?: kotlin.run {

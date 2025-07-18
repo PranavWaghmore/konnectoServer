@@ -39,7 +39,7 @@ fun Application.configureRouting() {
         unfollowUser(followService)
 
         // Post
-        createPost(postService)
+        createPost(postService, gson)
         getPostsForFollows(postService)
         deletePost(postService, likeService , commentService)
 

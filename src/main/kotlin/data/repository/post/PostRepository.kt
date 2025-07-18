@@ -5,7 +5,7 @@ import pw.coding.util.Constants
 
 interface PostRepository {
 
-    suspend fun createPostIfUserExists(post: Post):Boolean
+    suspend fun createPost(post: Post):Boolean
 
     suspend fun deletePostById(postId : String)
 
