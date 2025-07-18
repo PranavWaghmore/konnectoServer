@@ -11,6 +11,7 @@ import pw.coding.data.util.ParentType
 import pw.coding.service.ActivityService
 import pw.coding.service.LikeService
 import pw.coding.util.ApiResponseMessages
+import pw.coding.util.QueryParams
 
 fun Route.likeParent(
     likeService: LikeService,
@@ -75,6 +76,24 @@ fun Route.unlikeParent(
                     )
                 )
             }
+        }
+    }
+}
+
+fun Route.getLikesForParent(
+    likeService: LikeService
+){
+    authenticate {
+        post("/api/like/parent") {
+            val parentId = call.parameters[QueryParams.PARAM_PARENT_ID] ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+            val usersWhoLikedParent = likeService.getUsersWhoLikedParent(parentId, call.userId)
+            call.respond(
+                HttpStatusCode.OK,
+                usersWhoLikedParent
+            )
         }
     }
 }

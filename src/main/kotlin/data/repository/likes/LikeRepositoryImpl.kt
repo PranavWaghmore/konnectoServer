@@ -5,8 +5,8 @@ import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import pw.coding.data.models.Like
+import pw.coding.data.models.Post
 import pw.coding.data.models.User
-import pw.coding.data.util.ParentType
 
 class LikeRepositoryImpl(
     db : CoroutineDatabase
@@ -17,7 +17,7 @@ class LikeRepositoryImpl(
     override suspend fun likeParent(userId: String, parentId: String , parentType: Int): Boolean {
         val doesUserExists = users.findOneById(userId) != null
         return if(doesUserExists){
-            likes.insertOne(Like(userId, parentId , parentType))
+            likes.insertOne(Like(userId, parentId, parentType, System.currentTimeMillis()))
             true
         }else{
             false
@@ -41,5 +41,18 @@ class LikeRepositoryImpl(
 
     override suspend fun deleteLikesForParent(parentId: String) {
         likes.deleteMany(Like::parentId eq parentId)
+    }
+
+    override suspend fun getLikesForParent(
+        parentId: String,
+        page: Int,
+        pageSize: Int
+    ): List<Like> {
+        return likes
+            .find(Like::parentId eq parentId)
+            .skip(page * pageSize)
+            .limit(pageSize)
+            .descendingSort(Like::timestamp)
+            .toList()
     }
 }

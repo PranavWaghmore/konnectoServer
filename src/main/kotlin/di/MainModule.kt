@@ -34,12 +34,12 @@ val mainModule = module{
     single<CommentRepository> { CommentRepositoryImpl(get()) }
     single<ActivityRepository> { ActivityRepositoryImpl(get()) }
 
-    single { UserService(get() , get()) }
+    single { UserService(get(),get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
-    single { LikeService(get()) }
+    single { LikeService(get(),get(),get()) }
     single { CommentService(get()) }
-    single { ActivityService(get() , get() , get()) }
+    single { ActivityService(get(),get(),get()) }
 
     single { Gson() }
 
