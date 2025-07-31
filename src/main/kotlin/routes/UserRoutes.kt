@@ -10,7 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import pw.coding.data.models.User
-import pw.coding.data.requests.CreateUserRequest
+import pw.coding.data.requests.CreateAccountRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.requests.UpdateProfileRequest
 import pw.coding.data.responses.AuthResponse
@@ -33,7 +33,7 @@ fun Route.createUser(
     userService: UserService
 ) {
     post("/api/user/create") {
-        val request = call.receiveNullable<CreateUserRequest>() ?: kotlin.run {
+        val request = call.receiveNullable<CreateAccountRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }

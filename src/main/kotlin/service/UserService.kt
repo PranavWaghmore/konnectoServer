@@ -3,7 +3,7 @@ package pw.coding.service
 import data.repository.follow.FollowRepository
 import pw.coding.data.models.User
 import pw.coding.data.repository.user.UserRepository
-import pw.coding.data.requests.CreateUserRequest
+import pw.coding.data.requests.CreateAccountRequest
 import pw.coding.data.requests.LoginRequest
 import pw.coding.data.requests.UpdateProfileRequest
 import pw.coding.data.responses.ProfileResponse
@@ -68,7 +68,7 @@ class UserService(
     fun validatePassword(enteredPassword: String , actualPassword : String):Boolean{
         return enteredPassword == actualPassword
     }
-    suspend fun createUser(request: CreateUserRequest){
+    suspend fun createUser(request: CreateAccountRequest){
         userRepository.createUser(
             User(
                 email = request.email,
@@ -83,7 +83,7 @@ class UserService(
         )
     }
 
-    fun validateCreateAccountRequest(request: CreateUserRequest): ValidationEvent{
+    fun validateCreateAccountRequest(request: CreateAccountRequest): ValidationEvent{
         return if (request.email.isBlank() || request.password.isBlank() || request.username.isBlank()) {
             ValidationEvent.ErrorFieldEmpty
         }else{
