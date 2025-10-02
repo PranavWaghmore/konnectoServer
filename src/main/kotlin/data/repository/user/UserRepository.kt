@@ -2,7 +2,6 @@ package pw.coding.data.repository.user
 
 import pw.coding.data.models.User
 import pw.coding.data.requests.UpdateProfileRequest
-import java.awt.Image
 
 interface UserRepository {
 

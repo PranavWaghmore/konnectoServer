@@ -22,6 +22,7 @@ fun Application.configureRouting() {
     val jwtSecret = environment.config.property("jwt.secret").getString()
     routing {
         // User routes
+        authenticate()
         createUser(userService)
         loginUser(
             userService = userService,
@@ -56,7 +57,6 @@ fun Application.configureRouting() {
         //Activity
         getActivitiesForUser(activityService)
 
-        //staticResources("/static", "static")
         static {
             resources("static")
         }

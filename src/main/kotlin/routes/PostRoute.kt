@@ -54,7 +54,7 @@ fun Route.createPost(
                     imageUrl = postPictureUrl
                 )
                 if (createPostAcknowledged) {
-                    call.respond(HttpStatusCode.OK, BasicApiResponse(successful = true))
+                    call.respond(HttpStatusCode.OK, BasicApiResponse<Unit>(successful = true))
                 } else {
                     File("$POST_PICTURE_PATH/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
@@ -75,10 +75,9 @@ fun Route.getPostsForFollows(
             val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
                 ?.toIntOrNull() ?: Constants.POST_PAGE_SIZE
-
-            val posts = postService.getPostsByFollows(userId = call.userId , page , pageSize)
+            val posts = postService.getPostsByFollows(userId = call.userId, page , pageSize)
             call.respond(
-                HttpStatusCode.OK ,
+                HttpStatusCode.OK,
                 posts
             )
         }

@@ -52,4 +52,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.1.10")
     // Truth
     testImplementation("com.google.truth:truth:1.4.4")
+
+    implementation("org.fusesource.jansi:jansi:2.4.1")
+
 }

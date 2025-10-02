@@ -1,7 +1,6 @@
 package pw.coding.util
 
 import io.ktor.http.content.*
-import pw.coding.util.Constants.PROFILE_PICTURE_PATH
 import java.io.File
 import java.util.*
 
