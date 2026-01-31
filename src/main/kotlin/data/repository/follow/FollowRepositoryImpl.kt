@@ -3,7 +3,6 @@ package pw.coding.data.repository.follow
 import data.repository.follow.FollowRepository
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.deleteOne
 import org.litote.kmongo.eq
 import pw.coding.data.models.Following
 import pw.coding.data.models.User

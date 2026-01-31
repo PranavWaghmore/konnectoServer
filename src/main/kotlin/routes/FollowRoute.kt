@@ -23,7 +23,7 @@ fun Route.followUser(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val didUserExists = followService.followUserIfExists(request , call.userId)
+            val didUserExists = followService.followUserIfExists(request, call.userId)
             if(didUserExists){
                 activityService.createActivity(
                     Activity(
@@ -66,7 +66,7 @@ fun Route.unfollowUser(
             val didUserExists = followService.unfollowUserIfExists(request, call.userId)
             if(didUserExists){
                 call.respond(
-                    HttpStatusCode.BadRequest,
+                    HttpStatusCode.OK,
                     BasicApiResponse<Unit>(
                         successful = true
                     )
