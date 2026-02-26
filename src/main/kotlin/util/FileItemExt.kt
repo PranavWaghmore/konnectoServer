@@ -4,12 +4,21 @@ import io.ktor.http.content.*
 import java.io.File
 import java.util.*
 
-fun PartData.FileItem.save(path: String): String{
-    val fileBytes = streamProvider().use { it.readAllBytes() }
-    val fileExtension = originalFileName?.takeLastWhile { it != '.' }
-    val fileName= UUID.randomUUID().toString()+ "." + fileExtension
+
+fun PartData.FileItem.save(path: String): String? {
+    val original = originalFileName ?: return null
+    val extension = original.substringAfterLast('.', "")
+    if (extension.isBlank()) return null
+
+    val fileName = "${UUID.randomUUID()}.$extension"
     val folder = File(path)
-    folder.mkdirs()
-    File("$path$fileName").writeBytes(fileBytes)
+        folder.mkdirs()
+
+    streamProvider().use { input ->
+        File(folder, fileName).outputStream().use { output ->
+            input.copyTo(output)
+        }
+    }
+
     return fileName
 }

@@ -37,8 +37,6 @@ class PostRepositoryImpl(
             .limit(pageSize)
             .descendingSort(Post::timestamp)
             .toList()
-
-
     }
 
     override suspend fun getPostsForProfile(userId: String, page: Int, pageSize: Int): List<Post> {

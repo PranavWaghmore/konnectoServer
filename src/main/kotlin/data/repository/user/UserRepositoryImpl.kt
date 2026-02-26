@@ -27,7 +27,8 @@ class UserRepositoryImpl(
 
     override suspend fun updateUser(
         userId: String,
-        profileImageUrl: String,
+        profileImageUrl: String?,
+        bannerUrl: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean {
         val user =users.findOneById(userId) ?: return false
@@ -37,7 +38,8 @@ class UserRepositoryImpl(
                 email = user.email,
                 username = updateProfileRequest.username,
                 password = user.password,
-                profileImageUrl = profileImageUrl,
+                profileImageUrl = profileImageUrl ?: user.profileImageUrl,
+                bannerUrl = bannerUrl ?: user.bannerUrl,
                 bio = updateProfileRequest.bio,
                 gitHubUrl = updateProfileRequest.gitHubUrl,
                 instagramUrl = updateProfileRequest.instagramUrl,
@@ -61,14 +63,22 @@ class UserRepositoryImpl(
     }
 
     override suspend fun searchForUsers(query: String): List<User> {
+        if (query.isBlank()) return emptyList()
+
+        val escapedQuery = Regex.escape(query)
+        val regex = Regex(".*$escapedQuery.*", RegexOption.IGNORE_CASE)
+
         return users.find(
-            or(User::username regex Regex("(?i).*$query.*"),
-                User::email eq query
-                )
+            or(
+                User::username regex regex,
+                User::email regex regex
+            )
         )
             .descendingSort(User::followerCount)
+            .limit(20)
             .toList()
     }
+
 
     override suspend fun getUsers(userIds: List<String>): List<User> {
         return users.find(User::id `in` userIds).toList()

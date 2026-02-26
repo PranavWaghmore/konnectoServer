@@ -26,7 +26,8 @@ fun Route.createComment(
             }
             val userId = call.userId
             when ( commentService.createComment(request, userId)) {
-                CommentService.ValidationEvent.ErrorFieldEmpty ->
+
+                is CommentService.ValidationEvent.ErrorFieldEmpty ->
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse<Unit>(
@@ -35,7 +36,7 @@ fun Route.createComment(
                         )
                     )
 
-                CommentService.ValidationEvent.ErrorCommentTooLong ->
+                is CommentService.ValidationEvent.ErrorCommentTooLong ->
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse<Unit>(

@@ -54,7 +54,7 @@ class FollowRepositoryImpl(
 
     override suspend fun getFollowsByUser(userId: String): List<Following> {
         return following.find(
-            Following::followingUserId eq userId
+             Following::followingUserId eq userId
         ).toList()
     }
 }

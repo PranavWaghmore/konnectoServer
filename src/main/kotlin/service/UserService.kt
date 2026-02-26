@@ -18,15 +18,20 @@ class UserService(
         return userRepository.getUserByEmail(email) != null
     }
 
-    suspend fun getUserProfile(userId: String, callerUserId: String):ProfileResponse?{
+    suspend fun getUserProfile(
+        userId: String,
+        callerUserId: String
+    ):ProfileResponse?{
         val user = userRepository.getUserById(userId) ?: return  null
         return ProfileResponse(
+            userId = userId,
             username = user.username,
             bio = user.bio,
             followerCount = user.followerCount,
             followingCount = user.followingCount,
             postCount = user.postCount,
             profilePictureUrl = user.profileImageUrl,
+            bannerUrl = user.bannerUrl,
             topSkillUrls = user.skills,
             gitHubUrl = user.gitHubUrl,
             instagramUrl = user.instagramUrl,
@@ -42,10 +47,11 @@ class UserService(
 
     suspend fun  updateUser(
         userId: String,
-        profileImageUrl: String,
+        profileImageUrl: String?,
+        bannerUrl: String?,
         updateProfileRequest: UpdateProfileRequest
     ):Boolean{
-        return userRepository.updateUser(userId, profileImageUrl, updateProfileRequest)
+        return userRepository.updateUser(userId, profileImageUrl, bannerUrl,updateProfileRequest)
     }
     suspend fun searchForUsers(query: String , userId: String):List<UserResponseItem>{
         val users = userRepository.searchForUsers(query)
@@ -53,6 +59,7 @@ class UserService(
         return users.map { user ->
             val isFollowing = followsByUser.find { it.followedUserId == user.id } != null
             UserResponseItem(
+                userId= user.id,
                 username = user.username,
                 profilePictureUrl = user.profileImageUrl,
                 bio = user.bio,
@@ -75,6 +82,7 @@ class UserService(
                 username = request.username,
                 password = request.password,
                 profileImageUrl = "",
+                bannerUrl = "",
                 bio = "",
                 gitHubUrl = "",
                 instagramUrl = "",
@@ -91,7 +99,7 @@ class UserService(
         }
     }
 
-    sealed class ValidationEvent(){
+    sealed class ValidationEvent{
          object ErrorFieldEmpty: ValidationEvent()
          object Success: ValidationEvent()
     }

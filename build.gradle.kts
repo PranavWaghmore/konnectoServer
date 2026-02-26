@@ -50,8 +50,6 @@ dependencies {
     testImplementation("com.google.code.gson:gson:2.8.9")
     // Koin
     testImplementation("io.insert-koin:koin-test:3.5.0")
-    // Ktor Test
-    testImplementation("io.ktor:ktor-server-tests:3.2.0")
     // Kotlin Test
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.1.10")
     // Truth

@@ -59,7 +59,7 @@ fun Route.createPost(
                     File("$POST_PICTURE_PATH/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
-            } ?: kotlin.run {
+            }?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }

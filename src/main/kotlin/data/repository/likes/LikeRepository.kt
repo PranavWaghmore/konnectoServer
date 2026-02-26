@@ -1,7 +1,6 @@
 package data.repository.likes
 
 import pw.coding.data.models.Like
-import pw.coding.data.util.ParentType
 import pw.coding.util.Constants
 
 interface LikeRepository {
