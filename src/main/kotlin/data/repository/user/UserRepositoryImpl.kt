@@ -31,7 +31,7 @@ class UserRepositoryImpl(
         bannerUrl: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean {
-        val user =users.findOneById(userId) ?: return false
+        val user = users.findOneById(userId) ?: return false
         return users.updateOneById(
             id = userId,
             update = User(

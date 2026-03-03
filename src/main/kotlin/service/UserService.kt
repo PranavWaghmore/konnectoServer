@@ -21,7 +21,7 @@ class UserService(
     suspend fun getUserProfile(
         userId: String,
         callerUserId: String
-    ):ProfileResponse?{
+    ): ProfileResponse? {
         val user = userRepository.getUserById(userId) ?: return  null
         return ProfileResponse(
             userId = userId,
@@ -32,7 +32,7 @@ class UserService(
             postCount = user.postCount,
             profilePictureUrl = user.profileImageUrl,
             bannerUrl = user.bannerUrl,
-            topSkillUrls = user.skills,
+            topSkills = user.skills,
             gitHubUrl = user.gitHubUrl,
             instagramUrl = user.instagramUrl,
             linkedInUrl = user.linkedInUrl,

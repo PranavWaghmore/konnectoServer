@@ -15,6 +15,7 @@ fun Application.configureRouting() {
     val likeService: LikeService by inject()
     val commentService: CommentService by inject()
     val activityService: ActivityService by inject()
+    val skillsService: SkillsService by inject()
     val gson: Gson by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
@@ -56,6 +57,9 @@ fun Application.configureRouting() {
 
         //Activity
         getActivitiesForUser(activityService)
+
+        //Skills
+        getSkills(skillsService)
 
         static {
             resources("static")

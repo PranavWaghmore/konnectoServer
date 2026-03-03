@@ -7,10 +7,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import pw.coding.data.models.User
 import pw.coding.data.requests.UpdateProfileRequest
 import pw.coding.data.responses.BasicApiResponse
-import pw.coding.data.responses.ProfileResponse
 import pw.coding.data.responses.UserResponseItem
 import pw.coding.service.PostService
 import pw.coding.service.UserService
@@ -47,13 +45,7 @@ fun Route.searchUser(userService: UserService) {
 fun Route.getUserProfile(userService: UserService) {
     authenticate {
         get("/api/user/profile") {
-            val userId = call.parameters[QueryParams.PARAM_USER_ID]
-            if (userId.isNullOrBlank()) {
-                call.respond(
-                    HttpStatusCode.BadRequest
-                )
-                return@get
-            }
+            val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: call.userId
             val profileResponse = userService.getUserProfile(userId, call.userId)
             if (profileResponse == null) {
                 call.respond(
@@ -131,9 +123,10 @@ fun Route.updateUserProfile(
                     is PartData.BinaryItem -> Unit
                     is PartData.BinaryChannelItem -> Unit
                 }
+                partData.dispose()
             }
-            val profilePictureUrl = "${BASE_URL}profile_pictures/$profilePictureFileName"
-            val bannerImageUrl = "${BASE_URL}banner_images/$bannerImageFileName"
+            val profilePictureUrl = profilePictureFileName?.let { "${BASE_URL}profile_pictures/$profilePictureFileName"}
+            val bannerImageUrl = bannerImageFileName?.let {  "${BASE_URL}banner_images/$bannerImageFileName" }
             updateProfileRequest?.let { request ->
                 val updateAcknowledged = userService.updateUser(
                     userId = call.userId,
@@ -142,10 +135,15 @@ fun Route.updateUserProfile(
                     updateProfileRequest = request
                 )
                 if (updateAcknowledged) {
-                    call.respond(HttpStatusCode.OK, BasicApiResponse<Unit>(successful = true))
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse<Unit>(successful = true))
                 } else {
-                    File("${PROFILE_PICTURE_PATH}/$profilePictureFileName").delete()
-                    call.respond(HttpStatusCode.InternalServerError)
+                    profilePictureFileName?.let { File("$PROFILE_PICTURE_PATH/$it").delete() }
+                    bannerImageFileName?.let { File("$BANNER_IMAGE_PATH/$it").delete() }
+                    call.respond(
+                        HttpStatusCode.InternalServerError
+                    )
                 }
             } ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
