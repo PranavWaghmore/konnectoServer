@@ -70,28 +70,7 @@ fun Route.getUserProfile(userService: UserService) {
     }
 }
 
-fun Route.getPostsForProfile(
-    postService: PostService
-) {
-    authenticate {
-        get("/api/user/post") {
-            val userId = call.parameters[QueryParams.PARAM_USER_ID]
-            val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
-            val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
-                ?.toIntOrNull() ?: Constants.POST_PAGE_SIZE
 
-            val posts = postService.getPostsForProfile(
-                userId = userId ?: call.userId,
-                page,
-                pageSize
-            )
-            call.respond(
-                HttpStatusCode.OK,
-                posts
-            )
-        }
-    }
-}
 
 fun Route.updateUserProfile(
     userService: UserService,

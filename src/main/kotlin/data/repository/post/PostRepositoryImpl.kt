@@ -12,7 +12,6 @@ class PostRepositoryImpl(
 ) : PostRepository {
     private val posts = db.getCollection<Post>()
     private val following = db.getCollection<Following>()
-    private val users = db.getCollection<User>()
 
     override suspend fun createPost(post: Post): Boolean {
         return posts.insertOne(post).wasAcknowledged()

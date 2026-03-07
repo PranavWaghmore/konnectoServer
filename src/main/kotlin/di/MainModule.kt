@@ -12,6 +12,7 @@ import pw.coding.data.repository.activity.ActivityRepositoryImpl
 import pw.coding.data.repository.comment.CommentRepository
 import pw.coding.data.repository.comment.CommentRepositoryImpl
 import data.repository.likes.LikeRepositoryImpl
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.repository.post.PostRepositoryImpl
 import pw.coding.data.repository.skill.SkillRepository
@@ -39,7 +40,7 @@ val mainModule = module{
 
     single { UserService(get(),get()) }
     single { FollowService(get()) }
-    single { PostService(get()) }
+    single { PostService(get(),get()) }
     single { LikeService(get(),get(),get()) }
     single { CommentService(get()) }
     single { ActivityService(get(),get(),get()) }
