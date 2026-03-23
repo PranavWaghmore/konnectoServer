@@ -39,7 +39,7 @@ val mainModule = module{
 
     single { UserService(get(),get()) }
     single { FollowService(get()) }
-    single { PostService(get(),get()) }
+    single { PostService(get(),get(),get()) }
     single { LikeService(get(),get(),get()) }
     single { CommentService(get(),get(),get()) }
     single { ActivityService(get(),get(),get()) }

@@ -8,6 +8,7 @@ data class PostResponse(
     val profilePictureUrl: String,
     val timestamp: Long,
     val description: String,
+    val isLiked: Boolean,
     val likeCount: Int = 0,
     val commentCount: Int = 0,
 )

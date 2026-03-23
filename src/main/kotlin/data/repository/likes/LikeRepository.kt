@@ -1,13 +1,14 @@
 package data.repository.likes
 
 import pw.coding.data.models.Like
+import pw.coding.data.util.ParentType
 import pw.coding.util.Constants
 
 interface LikeRepository {
 
     suspend fun likeParent(userId : String, parentId : String , parentType: Int): Boolean
 
-    suspend fun unLikeParent(userId: String, parentId: String): Boolean
+    suspend fun unLikeParent(userId: String, parentId: String, parentType: Int): Boolean
 
     suspend fun deleteLikesForParent(parentId: String)
 
@@ -21,4 +22,6 @@ interface LikeRepository {
         userId: String,
         parentIds: List<String>
     ): List<String>
+
+    suspend fun isLikedParent(userId: String,parentId: String): Boolean
 }

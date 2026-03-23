@@ -62,7 +62,6 @@ class ActivityService(
                 type = when(parentType){
                     is ParentType.Post -> ActivityType.LikedPost.type
                     is ParentType.Comment -> ActivityType.LikedComment.type
-                    else -> ActivityType.LikedPost.type
                 },
                 parentId = parentID
             )

@@ -8,7 +8,7 @@ data class Comment(
     val userId: String,
     val postId: String,
     val timestamp: Long,
-    val likeCount: Int,
+    val likeCount: Int = 0,
     @BsonId
     val id: String = ObjectId().toString(),
 )

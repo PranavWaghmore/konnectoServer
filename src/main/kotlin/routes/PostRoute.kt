@@ -59,7 +59,7 @@ fun Route.createPost(
                     File("$POST_PICTURE_PATH/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
-            }?: kotlin.run {
+            }?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
@@ -113,14 +113,15 @@ fun Route.getPost(
 ){
     authenticate{
         get("api/post/details"){
-            val postId = call.parameters["postId"] ?: kotlin.run {
+            val postId = call.parameters["postId"] ?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
-            val post = postService.getPost(postId) ?: kotlin.run {
+            val post = postService.getPost(postId, userId = call.userId) ?: run {
                 call.respond(HttpStatusCode.NotFound)
                 return@get
             }
+            println("Post isLiked $post.")
             call.respond(
                 HttpStatusCode.OK,
                 BasicApiResponse(
@@ -139,12 +140,15 @@ fun Route.deletePost(
 ){
     authenticate {
         delete ("/api/post/delete") {
-            val request = call.receiveNullable<DeletePostRequest>() ?: kotlin.run {
+            val request = call.receiveNullable<DeletePostRequest>() ?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
             }
 
-            val post = postService.getPost(request.postId)
+            val post = postService.getPost(
+                request.postId,
+                userId = call.userId
+            )
             if(post==null){
                 call.respond(
                     HttpStatusCode.NotFound
