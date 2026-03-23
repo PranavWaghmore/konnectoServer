@@ -1,6 +1,7 @@
 package pw.coding.data.repository.comment
 
 import pw.coding.data.models.Comment
+import pw.coding.data.responses.CommentDto
 
 interface CommentRepository {
 

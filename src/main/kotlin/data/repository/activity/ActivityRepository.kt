@@ -1,6 +1,7 @@
 package pw.coding.data.repository.activity
 
 import pw.coding.data.models.Activity
+import pw.coding.data.responses.ActivityResponse
 import pw.coding.util.Constants
 
 interface ActivityRepository {
@@ -9,7 +10,7 @@ interface ActivityRepository {
         userId: String,
         page: Int = 0,
         pageSize: Int = Constants.ACTIVITY_PAGE_SIZE
-    ):List<Activity>
+    ):List<ActivityResponse>
 
     suspend fun createActivity(activity: Activity)
 

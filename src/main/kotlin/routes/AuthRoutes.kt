@@ -72,7 +72,6 @@ fun Route.loginUser(
             return@post
         }
         val user = userService.getUserByEmail(request.email) ?: kotlin.run {
-
             call.respond(
                 BasicApiResponse<Unit>(
                     successful = false,
@@ -96,7 +95,10 @@ fun Route.loginUser(
             call.respond(
                 BasicApiResponse(
                     successful = true,
-                    data = AuthResponse(token = token)
+                    data = AuthResponse(
+                        userId = user.id,
+                        token = token
+                    )
                 )
             )
         } else {

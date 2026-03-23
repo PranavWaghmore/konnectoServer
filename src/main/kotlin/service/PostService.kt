@@ -5,7 +5,6 @@ import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.requests.CreatePostRequest
 import pw.coding.data.responses.PostResponse
-import pw.coding.data.responses.ProfileResponse
 import pw.coding.util.Constants
 
 class PostService(
@@ -39,6 +38,7 @@ class PostService(
         return posts.map { post ->
             val user = usersById[post.userId]
             PostResponse(
+                id = post.id,
                 userId = post.userId,
                 imageUrl = post.imageUrl,
                 username = user?.username ?: "Hardcoded Username Ktor",
@@ -60,6 +60,7 @@ class PostService(
         val user = userRepository.getUserById(userId)
         return posts.map { post ->
             PostResponse(
+                id = post.id,
                 userId = post.userId,
                 imageUrl = post.imageUrl,
                 username = user?.username ?: "Hardcoded Username Ktor",
@@ -72,8 +73,20 @@ class PostService(
         }
     }
 
-    suspend fun getPost(postId : String) : Post?{
-        return postRepository.getPost(postId)
+    suspend fun getPost(postId : String) : PostResponse?{
+        val post =  postRepository.getPost(postId) ?: return null
+        val user = userRepository.getUserById(post.userId)
+        return PostResponse(
+            id = post.id,
+            userId = post.userId,
+            imageUrl = post.imageUrl,
+            username = user?.username ?: "Hardcoded Username Ktor",
+            profilePictureUrl = user?.profileImageUrl ?: "Hardcoded url ktor",
+            timestamp = post.timestamp,
+            description = post.description,
+            likeCount = post.likeCount,
+            commentCount = post.commentCount
+        )
     }
 
     suspend fun deletePost(postId: String){

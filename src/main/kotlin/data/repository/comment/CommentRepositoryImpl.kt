@@ -3,6 +3,7 @@ package pw.coding.data.repository.comment
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import pw.coding.data.models.Comment
+import pw.coding.data.responses.CommentDto
 
 class CommentRepositoryImpl(
     db: CoroutineDatabase

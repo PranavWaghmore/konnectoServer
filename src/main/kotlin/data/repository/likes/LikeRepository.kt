@@ -16,4 +16,9 @@ interface LikeRepository {
         page: Int = 0,
         pageSize: Int = Constants.ACTIVITY_PAGE_SIZE
     ): List<Like>
+
+    suspend fun getLikedParentIdsByUser(
+        userId: String,
+        parentIds: List<String>
+    ): List<String>
 }

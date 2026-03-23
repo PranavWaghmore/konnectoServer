@@ -7,7 +7,7 @@ data class Activity(
     val timestamp: Long,
     val byUserId: String,
     val toUserId: String,
-    val type: Any,
+    val type: Int,
     val parentId: String,
     @BsonId
     val id: String = ObjectId().toString(),

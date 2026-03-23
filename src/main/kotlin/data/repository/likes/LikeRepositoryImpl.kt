@@ -3,6 +3,7 @@ package data.repository.likes
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.`in`
 import pw.coding.data.models.Like
 import pw.coding.data.models.User
 
@@ -53,4 +54,19 @@ class LikeRepositoryImpl(
             .descendingSort(Like::timestamp)
             .toList()
     }
+
+    override suspend fun getLikedParentIdsByUser(
+        userId: String,
+        parentIds: List<String>
+    ): List<String> {
+        return likes.find(
+            and(
+                Like::userId eq userId,
+                Like::parentId `in` parentIds
+            )
+        ).toList().map { like ->
+            like.parentId
+        }
+    }
+
 }

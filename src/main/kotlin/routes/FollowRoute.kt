@@ -12,6 +12,7 @@ import pw.coding.data.util.ActivityType
 import pw.coding.service.ActivityService
 import pw.coding.service.FollowService
 import pw.coding.util.ApiResponseMessages.USER_NOT_FOUND
+import pw.coding.util.QueryParams
 
 fun Route.followUser(
     followService: FollowService,
@@ -59,11 +60,11 @@ fun Route.unfollowUser(
 ){
     authenticate {
         delete("/api/following/unfollow"){
-            val request = call.receiveNullable<FollowUpdateRequest>() ?: kotlin.run {
+            val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
             }
-            val didUserExists = followService.unfollowUserIfExists(request, call.userId)
+            val didUserExists = followService.unfollowUserIfExists(userId, call.userId)
             if(didUserExists){
                 call.respond(
                     HttpStatusCode.OK,

@@ -4,6 +4,7 @@ import pw.coding.data.models.Activity
 import pw.coding.data.repository.activity.ActivityRepository
 import pw.coding.data.repository.comment.CommentRepository
 import pw.coding.data.repository.post.PostRepository
+import pw.coding.data.responses.ActivityResponse
 import pw.coding.data.util.ActivityType
 import pw.coding.data.util.ParentType
 
@@ -17,7 +18,7 @@ class ActivityService(
         userId: String,
         page: Int,
         pageSize: Int
-    ): List<Activity> {
+    ): List<ActivityResponse> {
         return activityRepository.getActivitiesForUser(userId, page, pageSize)
     }
 

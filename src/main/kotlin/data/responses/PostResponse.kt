@@ -1,6 +1,7 @@
 package pw.coding.data.responses
 
 data class PostResponse(
+    val id: String,
     val userId: String,
     val imageUrl: String,
     val username : String,

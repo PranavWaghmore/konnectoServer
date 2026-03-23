@@ -1,5 +1,6 @@
 package pw.coding.routes
 
+import io.ktor.client.request.request
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -68,11 +69,11 @@ fun Route.getCommentsForPost(
 ) {
     authenticate {
         get("/api/comment/get") {
-            val postId = call.pathParameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest)
+            val postId = call.queryParameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest,"Null postId")
                 return@get
             }
-            val comments = commentService.getCommentsForPost(postId)
+            val comments = commentService.getCommentsForPost(postId, call.userId)
             call.respond(HttpStatusCode.OK , comments)
         }
     }

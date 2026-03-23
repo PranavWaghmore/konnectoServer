@@ -108,6 +108,30 @@ fun Route.getPostsForFollows(
 }
 
 
+fun Route.getPost(
+    postService: PostService
+){
+    authenticate{
+        get("api/post/details"){
+            val postId = call.parameters["postId"] ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+            val post = postService.getPost(postId) ?: kotlin.run {
+                call.respond(HttpStatusCode.NotFound)
+                return@get
+            }
+            call.respond(
+                HttpStatusCode.OK,
+                BasicApiResponse(
+                    successful = true,
+                    data = post
+                )
+            )
+        }
+    }
+}
+
 fun Route.deletePost(
     postService: PostService,
     likeService: LikeService,

@@ -10,10 +10,8 @@ import io.ktor.server.routing.*
 import pw.coding.data.requests.UpdateProfileRequest
 import pw.coding.data.responses.BasicApiResponse
 import pw.coding.data.responses.UserResponseItem
-import pw.coding.service.PostService
 import pw.coding.service.UserService
 import pw.coding.util.ApiResponseMessages.USER_NOT_FOUND
-import pw.coding.util.Constants
 import pw.coding.util.Constants.BANNER_IMAGE_PATH
 import pw.coding.util.Constants.BASE_URL
 import pw.coding.util.Constants.PROFILE_PICTURE_PATH
