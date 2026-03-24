@@ -86,14 +86,14 @@ fun Route.unlikeParent(
     }
 }
 
-fun Route.getLikesForParent(
+fun Route.getUsersWhoLikedParent(
     likeService: LikeService
 ){
     authenticate {
-        post("/api/like/parent") {
+        get("/api/like/parent") {
             val parentId = call.parameters[QueryParams.PARAM_PARENT_ID] ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
-                return@post
+                return@get
             }
             val usersWhoLikedParent = likeService.getUsersWhoLikedParent(parentId, call.userId)
             call.respond(
