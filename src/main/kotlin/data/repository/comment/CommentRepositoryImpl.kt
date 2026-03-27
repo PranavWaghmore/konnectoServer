@@ -2,7 +2,10 @@ package pw.coding.data.repository.comment
 
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.inc
+import org.litote.kmongo.setValue
 import pw.coding.data.models.Comment
+import pw.coding.data.models.Post
 import pw.coding.data.responses.CommentDto
 
 class CommentRepositoryImpl(
@@ -10,8 +13,19 @@ class CommentRepositoryImpl(
 ): CommentRepository {
 
     private val comments = db.getCollection<Comment>()
+    private val posts = db.getCollection<Post>()
     override suspend fun createComment(comment: Comment):String {
         comments.insertOne(comment)
+
+        val updateResult = posts.updateOne(
+            Post::id eq comment.postId,
+            inc(Post::commentCount, 1)
+        )
+
+        if (updateResult.modifiedCount == 0L) {
+            throw IllegalStateException("Failed to update post comment count")
+        }
+        
         return comment.id
     }
 

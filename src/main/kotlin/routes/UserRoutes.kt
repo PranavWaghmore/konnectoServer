@@ -59,7 +59,6 @@ fun Route.getUserProfile(userService: UserService) {
                     status = HttpStatusCode.OK,
                     message = BasicApiResponse(
                         successful = true,
-                        message = "Profile_Found",
                         data = profileResponse
                     )
                 )

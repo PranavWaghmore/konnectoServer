@@ -121,7 +121,6 @@ fun Route.getPost(
                 call.respond(HttpStatusCode.NotFound)
                 return@get
             }
-            println("Post isLiked $post.")
             call.respond(
                 HttpStatusCode.OK,
                 BasicApiResponse(
