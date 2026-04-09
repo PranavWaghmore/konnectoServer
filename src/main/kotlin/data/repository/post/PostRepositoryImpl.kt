@@ -28,13 +28,14 @@ class PostRepositoryImpl(
     ): List<Post> {
         val userIdsFromFollows = following.find(Following::followingUserId eq userId)
             .toList()
-            .map {
-                it.followedUserId
-            }
+            .map { it.followedUserId }
+
+        if(userIdsFromFollows.isEmpty()) return emptyList()
+
         return posts.find(Post::userId `in` userIdsFromFollows)
+            .descendingSort(Post::timestamp)
             .skip(page * pageSize)
             .limit(pageSize)
-            .descendingSort(Post::timestamp)
             .toList()
     }
 

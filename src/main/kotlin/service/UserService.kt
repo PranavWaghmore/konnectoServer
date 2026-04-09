@@ -8,6 +8,7 @@ import pw.coding.data.requests.LoginRequest
 import pw.coding.data.requests.UpdateProfileRequest
 import pw.coding.data.responses.ProfileResponse
 import pw.coding.data.responses.UserResponseItem
+import pw.coding.util.Constants
 
 class UserService(
     private val userRepository: UserRepository,
@@ -81,9 +82,9 @@ class UserService(
                 email = request.email,
                 username = request.username,
                 password = request.password,
-                profileImageUrl = "",
-                bannerUrl = "",
-                bio = "",
+                profileImageUrl = Constants.DEFAULT_PROFILE_PICTURE_PATH,
+                bannerUrl = Constants.DEFAULT_BANNER_IMAGE_PATH,
+                bio = "This is Default Bio",
                 gitHubUrl = "",
                 instagramUrl = "",
                 linkedInUrl = "",

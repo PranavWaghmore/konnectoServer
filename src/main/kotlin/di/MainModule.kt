@@ -12,6 +12,8 @@ import pw.coding.data.repository.activity.ActivityRepositoryImpl
 import pw.coding.data.repository.comment.CommentRepository
 import pw.coding.data.repository.comment.CommentRepositoryImpl
 import data.repository.likes.LikeRepositoryImpl
+import pw.coding.data.repository.chat.ChatRepository
+import pw.coding.data.repository.chat.ChatRepositoryImpl
 import pw.coding.data.repository.post.PostRepository
 import pw.coding.data.repository.post.PostRepositoryImpl
 import pw.coding.data.repository.skill.SkillRepository
@@ -19,6 +21,8 @@ import pw.coding.data.repository.skill.SkillRepositoryImpl
 import pw.coding.data.repository.user.UserRepository
 import pw.coding.data.repository.user.UserRepositoryImpl
 import pw.coding.service.*
+import pw.coding.service.chat.ChatController
+import pw.coding.service.chat.ChatService
 import pw.coding.util.Constants
 
 
@@ -36,6 +40,7 @@ val mainModule = module{
     single<CommentRepository> { CommentRepositoryImpl(get()) }
     single<ActivityRepository> { ActivityRepositoryImpl(get()) }
     single<SkillRepository> { SkillRepositoryImpl(get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get()) }
 
     single { UserService(get(),get()) }
     single { FollowService(get()) }
@@ -44,7 +49,11 @@ val mainModule = module{
     single { CommentService(get(),get(),get()) }
     single { ActivityService(get(),get(),get()) }
     single { SkillsService(get()) }
+    single { ChatService(get()) }
+
 
     single { Gson() }
+
+    single { ChatController(get()) }
 
 }

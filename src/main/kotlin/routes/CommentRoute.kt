@@ -1,6 +1,5 @@
 package pw.coding.routes
 
-import io.ktor.client.request.request
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -26,7 +25,7 @@ fun Route.createComment(
                 return@post
             }
             val userId = call.userId
-            when ( commentService.createComment(request, userId)) {
+            when (commentService.createComment(request, userId)) {
 
                 is CommentService.ValidationEvent.ErrorFieldEmpty ->
                     call.respond(
@@ -46,9 +45,9 @@ fun Route.createComment(
                         )
                     )
 
-                is CommentService.ValidationEvent.Success ->{
+                is CommentService.ValidationEvent.Success -> {
                     activityService.addCommentActivity(
-                        byUserId =userId,
+                        byUserId = userId,
                         postId = request.postId,
                     )
                     call.respond(
@@ -67,15 +66,13 @@ fun Route.createComment(
 fun Route.getCommentsForPost(
     commentService: CommentService
 ) {
-    authenticate {
-        get("/api/comment/get") {
-            val postId = call.queryParameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest,"Null postId")
-                return@get
-            }
-            val comments = commentService.getCommentsForPost(postId, call.userId)
-            call.respond(HttpStatusCode.OK , comments)
+    get("/api/comment/get") {
+        val postId = call.queryParameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest, "Null postId")
+            return@get
         }
+        val comments = commentService.getCommentsForPost(postId, call.userId)
+        call.respond(HttpStatusCode.OK, comments)
     }
 }
 
@@ -92,7 +89,7 @@ fun Route.deleteComment(
             }
 
             val comment = commentService.getCommentById(request.commentId)
-            if(comment?.userId != call.userId){
+            if (comment?.userId != call.userId) {
                 call.respond(HttpStatusCode.Unauthorized)
                 return@delete
             }

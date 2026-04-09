@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "pw.coding"
@@ -18,6 +19,7 @@ repositories {
 dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
+    implementation("io.ktor:ktor-server-sessions")
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.gson)
     implementation(libs.ktor.server.call.logging)
@@ -30,6 +32,10 @@ dependencies {
     implementation(libs.logback.classic)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+
+    // Gson
+    testImplementation("com.google.code.gson:gson:2.8.9")
 
     // KMongo
     implementation("org.litote.kmongo:kmongo:5.2.0")
@@ -46,8 +52,6 @@ dependencies {
 
     // Test dependencies
 
-    // Gson
-    testImplementation("com.google.code.gson:gson:2.8.9")
     // Koin
     testImplementation("io.insert-koin:koin-test:3.5.0")
     // Kotlin Test

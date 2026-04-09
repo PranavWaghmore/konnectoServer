@@ -18,25 +18,29 @@ class ActivityRepositoryImpl(
         page: Int,
         pageSize: Int
     ): List<ActivityResponse> {
-        val activities =  activities.find(Activity::toUserId eq userId)
-            .skip(page*pageSize)
+        val activityList = activities.find(Activity::toUserId eq userId)
+            .skip(page * pageSize)
             .limit(pageSize)
             .descendingSort(Activity::timestamp)
             .toList()
 
-        val userIds = activities.map { it.byUserId }
-        val users = users.find(User::id `in` userIds).toList()
-        return activities.mapIndexed { i, activity ->
+        val userIds = activityList.map { it.byUserId }.distinct()
+        val userMap = users.find(User::id `in` userIds)
+            .toList()
+            .associateBy { it.id }
+
+        return activityList.map { activity ->
             ActivityResponse(
                 userId = activity.byUserId,
                 parentId = activity.parentId,
-                username = users[i].username,
+                username = userMap[activity.byUserId]?.username ?: "",
                 type = activity.type,
                 timeStamp = activity.timestamp,
                 id = activity.id
             )
         }
     }
+
 
     override suspend fun createActivity(activity: Activity) {
          activities.insertOne(activity)

@@ -4,9 +4,13 @@ import com.google.gson.Gson
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.sessions
 import org.koin.ktor.ext.inject
 import pw.coding.routes.*
 import pw.coding.service.*
+import pw.coding.service.chat.ChatController
+import pw.coding.service.chat.ChatService
+import pw.coding.service.chat.ChatSession
 
 fun Application.configureRouting() {
     val userService: UserService by inject()
@@ -16,6 +20,8 @@ fun Application.configureRouting() {
     val commentService: CommentService by inject()
     val activityService: ActivityService by inject()
     val skillsService: SkillsService by inject()
+    val chatService: ChatService by inject()
+    val chatController: ChatController by inject()
     val gson: Gson by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
@@ -61,6 +67,12 @@ fun Application.configureRouting() {
 
         //Skills
         getSkills(skillsService)
+
+
+        //Chat
+        getMessagesForChat(chatService)
+        getChatsForUser(chatService)
+        chatWebSocket(chatController = chatController)
 
         static {
             resources("static")

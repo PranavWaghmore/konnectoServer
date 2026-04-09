@@ -39,9 +39,11 @@ fun Route.createPost(
                             )
                         }
                     }
+
                     is PartData.FileItem -> {
                         fileName = partData.save(POST_PICTURE_PATH)
                     }
+
                     is PartData.BinaryItem -> Unit
                     is PartData.BinaryChannelItem -> Unit
                 }
@@ -59,7 +61,7 @@ fun Route.createPost(
                     File("$POST_PICTURE_PATH/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
-            }?: run {
+            } ?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
@@ -98,7 +100,7 @@ fun Route.getPostsForFollows(
             val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]
                 ?.toIntOrNull() ?: Constants.POST_PAGE_SIZE
-            val posts = postService.getPostsByFollows(userId = call.userId, page , pageSize)
+            val posts = postService.getPostsByFollows(userId = call.userId, page, pageSize)
             call.respond(
                 HttpStatusCode.OK,
                 posts
@@ -110,25 +112,23 @@ fun Route.getPostsForFollows(
 
 fun Route.getPost(
     postService: PostService
-){
-    authenticate{
-        get("api/post/details"){
-            val postId = call.parameters["postId"] ?: run {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-            val post = postService.getPost(postId, userId = call.userId) ?: run {
-                call.respond(HttpStatusCode.NotFound)
-                return@get
-            }
-            call.respond(
-                HttpStatusCode.OK,
-                BasicApiResponse(
-                    successful = true,
-                    data = post
-                )
-            )
+) {
+    get("api/post/details") {
+        val postId = call.parameters["postId"] ?: run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
         }
+        val post = postService.getPost(postId, userId = call.userId) ?: run {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+        call.respond(
+            HttpStatusCode.OK,
+            BasicApiResponse(
+                successful = true,
+                data = post
+            )
+        )
     }
 }
 
@@ -136,9 +136,9 @@ fun Route.deletePost(
     postService: PostService,
     likeService: LikeService,
     commentService: CommentService
-){
+) {
     authenticate {
-        delete ("/api/post/delete") {
+        delete("/api/post/delete") {
             val request = call.receiveNullable<DeletePostRequest>() ?: run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
@@ -148,18 +148,18 @@ fun Route.deletePost(
                 request.postId,
                 userId = call.userId
             )
-            if(post==null){
+            if (post == null) {
                 call.respond(
                     HttpStatusCode.NotFound
                 )
                 return@delete
             }
-            if(post.userId == call.userId){
+            if (post.userId == call.userId) {
                 postService.deletePost(request.postId)
                 likeService.deleteLikesForParent(request.postId)
                 commentService.deleteCommentsForPost(request.postId)
                 call.respond(HttpStatusCode.OK)
-            }else{
+            } else {
                 call.respond(HttpStatusCode.Unauthorized)
             }
         }
