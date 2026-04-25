@@ -72,7 +72,7 @@ fun Application.configureRouting() {
         //Chat
         getMessagesForChat(chatService)
         getChatsForUser(chatService)
-        chatWebSocket(chatController = chatController)
+        chatWebSocket(chatController = chatController, gson)
 
         static {
             resources("static")

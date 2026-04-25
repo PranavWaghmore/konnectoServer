@@ -14,12 +14,10 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
-import kotlinx.coroutines.channels.consume
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.serialization.json.Json
 import org.koin.java.KoinJavaComponent.inject
-import org.koin.ktor.ext.inject
 import pw.coding.data.models.Message
+import pw.coding.data.webSocket.WsClientMessage
 import pw.coding.service.chat.ChatController
 import pw.coding.service.chat.ChatService
 import pw.coding.service.chat.ChatSession
@@ -65,53 +63,59 @@ fun Route.getChatsForUser(chatService: ChatService){
 }
 
 
-fun Route.chatWebSocket(chatController: ChatController){
-    webSocket("/api/chat/websocket") {
-        val session = call.sessions.get<ChatSession>()
-        if(session == null){
-            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY,"No Session"))
-            return@webSocket
-        }
-        chatController.onJoin(session,this)
-        try {
-            incoming.consumeEach { frame ->
-                when(frame){
-                    is Frame.Text ->{
-                        val frameText = frame.readText()
-                        val delimiterIndex = frameText.indexOf('#')
-                        if(delimiterIndex == -1){
-                            return@consumeEach
+fun Route.chatWebSocket(chatController: ChatController, gson: Gson){
+    authenticate {
+        webSocket("/api/chat/websocket") {
+            println("Connecting via web socket")
+            chatController.onJoin(call.userId,this)
+            try {
+                incoming.consumeEach { frame ->
+                    when(frame){
+                        is Frame.Text ->{
+                            val frameText = frame.readText()
+                            val delimiterIndex = frameText.indexOf('#')
+                            println("frameText is $frameText")
+                            if(delimiterIndex == -1){
+                                println("In Delimeter $delimiterIndex")
+                                return@consumeEach
+                            }
+                            println("")
+                            val type = frameText.substring(0,delimiterIndex).toIntOrNull()
+                            println("In type $type")
+                            if(type == null) return@consumeEach
+                            val json = frameText.substring(delimiterIndex+1)
+                            handleWebSocket(
+                                call.userId,chatController, gson = gson,type,frameText,json
+                            )
                         }
-                        val type = frameText.substring(0,delimiterIndex + 1).toIntOrNull() ?: return@consumeEach
-                        val json = frameText.substring(delimiterIndex,frameText.length - 1)
-                        handleWebSocket(this,session,chatController,type,json)
+                        else -> Unit
                     }
-                    else -> Unit
                 }
+            }catch (e: Exception){
+                e.printStackTrace()
+                close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Error"))
+            }finally {
+                chatController.onDisconnect(call.userId)
             }
-        }catch (e: Exception){
-            e.printStackTrace()
-            close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Error"))
-        }finally {
-            chatController.onDisconnect(session.userId)
         }
     }
 }
 
 
 suspend fun handleWebSocket(
-    webSocketSession: WebSocketSession,
-    session: ChatSession,
+   ownUserId: String,
     chatController: ChatController,
+   gson: Gson,
     type: Int,
+    frameText: String,
     json: String
 ){
-    val gson: Gson by inject(Gson::class.java)
+    println("IN HandleSocket")
     when(type){
-
         WebSocketObject.MESSAGE.ordinal -> {
-            val message = gson.fromJsonOrNull(json, Message::class.java) ?: return
-           return  chatController.sendMessage(message = message , json = json)
+            val message = gson.fromJsonOrNull(json, WsClientMessage::class.java) ?: return
+            println("Message is $message")
+           return  chatController.sendMessage(ownUserId,gson, message = message)
         }
     }
 }

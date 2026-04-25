@@ -11,6 +11,7 @@ import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
 import io.ktor.util.generateNonce
+import pw.coding.routes.userId
 import pw.coding.service.chat.ChatSession
 
 fun Application.configureSessions(){
@@ -25,8 +26,7 @@ fun Application.configureSessions(){
     intercept(ApplicationCallPipeline.Plugins) {   // If session doesn't exist to chat it creates one
         val existingSession = call.sessions.get<ChatSession>()
         if (existingSession == null) {
-            val userId = call.parameters["userId"] ?: return@intercept
-            call.sessions.set(ChatSession(userId = userId, sessionId = generateNonce()))
+            call.sessions.set(ChatSession(call.userId, sessionId = generateNonce()))
         }
     }
 }

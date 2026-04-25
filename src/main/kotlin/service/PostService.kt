@@ -33,7 +33,7 @@ class PostService(
         pageSize: Int = Constants.POST_PAGE_SIZE
     ): List<PostResponse> {
         val posts =  postRepository.getPostsByFollows(userId , page , pageSize)
-        val userIds = posts.map { it.userId }.distinct()
+        val  userIds = posts.map { it.userId }.distinct()
         val users = userRepository.getUsers(userIds)
         val usersById = users.associateBy { it.id }
 

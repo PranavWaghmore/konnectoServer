@@ -35,21 +35,19 @@ class ChatRepositoryImpl(
         return chats.find(Chat::userIds contains ownUserId)
             .descendingSort(Chat::timestamp)
             .toList()
-            .map { chat ->
+            .mapNotNull { chat ->
 
-                val otherUserId = chat.userIds.find { it != ownUserId }
-
-                val user = users.findOneById(otherUserId ?: "")
-
+                val otherUserId = chat.userIds.find { it != ownUserId } ?: return@mapNotNull null
+                val user = users.findOneById(otherUserId) ?: return@mapNotNull null
                 val message = messages.findOneById(chat.lastMessageId)
 
                 ChatDto(
                     chatId = chat.id,
-                    remoteUserId = user?.id ?: "",
-                    remoteUsername = user?.username ?: "Hard",
-                    remoteUserProfilePictureUrl = user?.profileImageUrl ?: "",
-                    lastMessage = message?.text ?: "Hard",
-                    timestamp = message?.timestamp ?: 0
+                    remoteUserId = user.id,
+                    remoteUsername = user.username,
+                    remoteUserProfilePictureUrl = user.profileImageUrl,
+                    lastMessage = message?.text ?: "",
+                    timestamp = message?.timestamp ?: chat.timestamp
                 )
             }
     }
@@ -62,7 +60,7 @@ class ChatRepositoryImpl(
         messages.insertOne(message)
     }
 
-    override suspend fun insertChat(userId1: String, userId2: String, messageId: String) {
+    override suspend fun insertChat(userId1: String, userId2: String, messageId: String): String {
 
         val chat = Chat(
                 userIds = listOf(
@@ -77,6 +75,7 @@ class ChatRepositoryImpl(
             messageId,
             setValue(Message::chatId , chatId)
         )
+        return chat.id
     }
 
 

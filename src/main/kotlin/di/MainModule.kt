@@ -25,7 +25,9 @@ import pw.coding.service.chat.ChatController
 import pw.coding.service.chat.ChatService
 import pw.coding.util.Constants
 
-
+import kotlinx.coroutines.runBlocking
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import pw.coding.data.models.Chat
 val mainModule = module{
     single {
         val client = KMongo.createClient(
@@ -56,4 +58,27 @@ val mainModule = module{
 
     single { ChatController(get()) }
 
+}
+
+
+
+
+
+fun seedChats(database: CoroutineDatabase) = runBlocking {
+    val chats = database.getCollection<Chat>()
+
+    val currentUserId = "699005470ad3504f1d60cd0a"
+
+    if (chats.countDocuments() == 0L) {
+        val sampleChats = listOf(
+            Chat(
+                userIds = listOf(currentUserId, "697d7b045806f933cc782fde"),
+                lastMessageId = "last_msg_1",
+                timestamp = System.currentTimeMillis()
+            )
+        )
+
+        chats.insertMany(sampleChats)
+        println("Seeded sample chats")
+    }
 }
