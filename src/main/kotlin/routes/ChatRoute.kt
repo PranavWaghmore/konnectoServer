@@ -110,7 +110,6 @@ suspend fun handleWebSocket(
     frameText: String,
     json: String
 ){
-    println("IN HandleSocket")
     when(type){
         WebSocketObject.MESSAGE.ordinal -> {
             val message = gson.fromJsonOrNull(json, WsClientMessage::class.java) ?: return
